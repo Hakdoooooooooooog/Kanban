@@ -5,17 +5,114 @@
   --foreground: #171717;
 }
 
+@custom-variant light (&:where(.light, .light *));
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  /* Primary Colors */
+  --color-primary: #635fc7;
+  --color-primary-dark: #ea5555;
+
+  /* Secondary Colors */
+  --color-secondary: #a8a4ff;
+  --color-secondary-light: #ff9898;
+
+  /* Neutral / Utility Colors */
+  --color-black: #000112;
+  --color-gray-900: #20212c;
+  --color-gray-800: #2b2c37;
+  --color-gray-700: #3e3f4e;
+  --color-gray-500: #828fa3;
+  --color-gray-200: #e4ebfa;
+  --color-gray-100: #f4f7fd;
+  --color-white: #ffffff;
+
+  /* --- Typography --- */
+
+  /* Font Families */
+  --font-Jakarta-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+
+  /* Font Sizes */
+  --text-xl: 30px;
+  --text-l: 18px;
+  --text-m: 15px;
+  --text-s: 12px;
+  --text-body-l: 13px;
+  --text-body-m: 12px;
+
+  /* Line Heights */
+  --line-height-xl: 30px;
+  --line-height-l: 23px;
+  --line-height-m: 19px;
+  --line-height-s: 15px;
+  --line-height-body-l: 23px;
+  --line-height-body-m: 15px;
+
+  /* Letter Spacing */
+  --letter-spacing-s: 2.4px;
+
+  /* --color-*: initial; */
+}
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-Jakarta: var(--font-Jakarta-sans);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
     --foreground: #ededed;
+  }
+}
+
+@layer components {
+  .icon {
+    width: 20px;
+    height: 20px;
+    color: var(--color-gray-500);
+
+    @variants dark {
+      color: var(--color-gray-900);
+    }
+  }
+
+  .active {
+    @apply rounded-r-full !text-white bg-primary font-bold;
+  }
+
+  .switch {
+    width: 40px;
+    height: 20px;
+    border-radius: 16px;
+    background-color: var(--color-primary);
+    position: relative;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+
+    &[data-checked] {
+      background-color: var(--color-primary-dark);
+    }
+
+    &[data-checked]:active {
+      background-color: var(--color-secondary-light);
+    }
+  }
+
+  .switch-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: var(--color-white);
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translate(4px, 4px);
+    transition: transform 0.2s ease-in-out;
+
+    &[data-checked] {
+      transform: translate(24px, 4px);
+    }
   }
 }
 
