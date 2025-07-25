@@ -78,7 +78,7 @@
   }
 
   .active {
-    @apply rounded-r-full !text-white bg-primary font-bold;
+    @apply !text-white bg-primary font-bold;
   }
 
   .switch {

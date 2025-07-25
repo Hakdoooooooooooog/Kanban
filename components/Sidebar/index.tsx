@@ -10,7 +10,7 @@ import SidebarFooter from "./components/SidebarFooter";
 
 const Sidebar = () => {
   const [theme, setTheme] = React.useState("light");
-  const { isSidebarHidden, setSidebarHidden } = useSidebar();
+  const { setSidebarHidden } = useSidebar();
   const sidebarRef = useRef<HTMLDivElement>(null);
   const showButtonRef = useRef<HTMLButtonElement>(null);
 

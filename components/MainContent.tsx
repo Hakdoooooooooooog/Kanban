@@ -27,7 +27,7 @@ const MainContent = ({ children }: MainContentProps) => {
   return (
     <div
       ref={contentRef}
-      className="flex-1 min-h-screen bg-gray-50 dark:bg-gray-900"
+      className="flex-1 transition-all duration-400 ease-in-out"
       style={{
         width: isSidebarHidden ? "100%" : "calc(100% - 300px)",
         marginLeft: isSidebarHidden ? "0px" : "300px",
