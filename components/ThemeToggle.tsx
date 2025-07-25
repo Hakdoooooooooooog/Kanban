@@ -1,7 +1,7 @@
 import React from "react";
 import { Switch } from "@base-ui-components/react";
-import LightIcon from "./icons/LightIcon";
-import DarkIcon from "./icons/DarkIcon";
+import LightIcon from "./SVGIcons/LightIcon";
+import DarkIcon from "./SVGIcons/DarkIcon";
 
 interface ThemeToggleProps {
   theme: string;

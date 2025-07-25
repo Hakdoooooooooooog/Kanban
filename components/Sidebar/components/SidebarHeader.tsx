@@ -1,5 +1,5 @@
 import React from "react";
-import LogoKanban from "../../icons/LogoKanban";
+import LogoKanban from "../../SVGIcons/LogoKanban";
 
 const SidebarHeader = () => {
   return (

@@ -1,9 +1,19 @@
+"use client";
+
+import { SidebarProvider } from "../contexts/SidebarContext";
+import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
+import MainContent from "../components/MainContent";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen">
-      <Sidebar />
-    </div>
+    <SidebarProvider>
+      <div className="flex min-h-screen relative overflow-hidden">
+        <Sidebar />
+        <MainContent>
+          <Header />
+        </MainContent>
+      </div>
+    </SidebarProvider>
   );
 }

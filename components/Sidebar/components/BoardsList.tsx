@@ -1,5 +1,5 @@
 import React from "react";
-import FluentBoardSplit24Regular from "../../icons/FluentBoardSplit24Regular";
+import FluentBoardSplit24Regular from "../../SVGIcons/FluentBoardSplit24Regular";
 
 interface Board {
   id: string;

@@ -1,5 +1,5 @@
 import React from "react";
-import EyeSlash from "../../icons/EyeSlash";
+import EyeSlash from "../../SVGIcons/EyeSlash";
 
 interface SidebarFooterProps {
   onHide?: () => void;
