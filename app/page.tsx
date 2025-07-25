@@ -4,6 +4,7 @@ import { SidebarProvider } from "../contexts/SidebarContext";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
 import MainContent from "../components/MainContent";
+import Board from "../components/Board";
 
 export default function Home() {
   return (
@@ -12,6 +13,7 @@ export default function Home() {
         <Sidebar />
         <MainContent>
           <Header />
+          <Board />
         </MainContent>
       </div>
     </SidebarProvider>

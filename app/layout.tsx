@@ -39,7 +39,7 @@ export default function RootLayout({
           href="/images/favicon-16x16.png"
         />
       </head>
-      <body className={` ${plusJakartaSans.variable} antialiased`}>
+      <body className={`${plusJakartaSans.variable} font-Jakarta antialiased`}>
         {children}
       </body>
     </html>
