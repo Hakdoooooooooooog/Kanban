@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import { ClientThemeProvider } from "../components/ClientThemeProvider";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -19,8 +20,31 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html suppressHydrationWarning lang="en">
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                function getPreferredTheme() {
+                  const stored = localStorage.getItem('theme');
+                  if (stored === 'light' || stored === 'dark') {
+                    return stored;
+                  }
+                  
+                  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    return 'dark';
+                  }
+                  
+                  return 'light';
+                }
+                
+                const theme = getPreferredTheme();
+                document.documentElement.classList.add(theme);
+              })();
+            `,
+          }}
+        />
         <link
           rel="apple-touch-icon"
           sizes="180x180"
@@ -40,7 +64,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${plusJakartaSans.variable} font-Jakarta antialiased`}>
-        {children}
+        <ClientThemeProvider>{children}</ClientThemeProvider>
       </body>
     </html>
   );

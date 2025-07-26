@@ -9,7 +9,7 @@ type Column = {
   order: number;
 };
 
-type Tasks = {
+export type Tasks = {
   id: string;
   title: string;
   description?: string;
@@ -83,6 +83,9 @@ const SampleTasks: Tasks[] = [
 ];
 
 const Board = () => {
+  const [openModalTaskId, setOpenModalTaskId] = React.useState<string | null>(
+    null
+  );
   const [columns, setColumns] = React.useState<Column[]>(defaultColumns);
 
   const addNewColumn = (name: string, color: string) => {
@@ -93,6 +96,10 @@ const Board = () => {
       order: columns.length,
     };
     setColumns([...columns, newColumn]);
+  };
+
+  const handleCloseModal = () => {
+    setOpenModalTaskId(null);
   };
 
   if (SampleTasks.length === 0) {
@@ -111,13 +118,18 @@ const Board = () => {
             return (
               <Column key={column.id} column={column} count={tasks.length}>
                 {tasks.map((task) => (
-                  <Card key={task.id} {...task} />
+                  <Card
+                    key={task.id}
+                    {...task}
+                    isModalOpen={openModalTaskId === task.id}
+                    onOpenModal={() => setOpenModalTaskId(task.id)}
+                    onCloseModal={handleCloseModal}
+                  />
                 ))}
               </Column>
             );
           })}
         <AddColumn onAddColumn={addNewColumn} />
-        <Modal />
       </div>
     </section>
   );
@@ -155,9 +167,24 @@ const EmptyBoard = ({
   );
 };
 
-const Card = ({ id: taskId, title, description, subtasks }: Tasks) => {
+const Card = ({
+  id: taskId,
+  title,
+  description,
+  subtasks,
+  isModalOpen,
+  onOpenModal,
+  onCloseModal,
+}: Tasks & {
+  isModalOpen: boolean;
+  onOpenModal: () => void;
+  onCloseModal: () => void;
+}) => {
   return (
-    <div className="w-full p-4 bg-gray-200 dark:bg-gray-800 rounded-lg shadow-sm">
+    <div
+      onClick={onOpenModal}
+      className="w-full p-4 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 rounded-lg shadow-sm"
+    >
       <h4 className="text-md text-black dark:text-white font-semibold">
         {title}
       </h4>
@@ -175,6 +202,12 @@ const Card = ({ id: taskId, title, description, subtasks }: Tasks) => {
           of {subtasks.length} subtasks completed
         </p>
       )}
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={onCloseModal}
+        task={SampleTasks.find((task) => task.id === taskId) || ({} as Tasks)}
+      />
     </div>
   );
 };

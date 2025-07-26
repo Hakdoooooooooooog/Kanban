@@ -5,6 +5,13 @@
   --foreground: #171717;
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
 @custom-variant light (&:where(.light, .light *));
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -58,14 +65,6 @@
   --color-foreground: var(--foreground);
   --font-Jakarta: var(--font-Jakarta-sans);
 }
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 @layer components {
   .icon {
     width: 20px;

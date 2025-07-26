@@ -9,16 +9,9 @@ import ThemeToggle from "../ThemeToggle";
 import SidebarFooter from "./components/SidebarFooter";
 
 const Sidebar = () => {
-  const [theme, setTheme] = React.useState<string>("light");
   const { setSidebarHidden } = useSidebar();
   const sidebarRef = useRef<HTMLDivElement>(null);
   const showButtonRef = useRef<HTMLButtonElement>(null);
-
-  const toggleTheme = () => {
-    const newTheme = theme === "light" ? "dark" : "light";
-    setTheme(newTheme);
-    document.documentElement.classList.toggle("dark", newTheme === "dark");
-  };
 
   const handleAddBoard = () => {
     console.log("Add New Board clicked");
@@ -91,7 +84,7 @@ const Sidebar = () => {
         <BoardsList onAddBoard={handleAddBoard} />
 
         <div className="w-3/4 flex flex-col gap-4 justify-between pb-16 mx-auto">
-          <ThemeToggle theme={theme} onToggle={toggleTheme} />
+          <ThemeToggle />
           <SidebarFooter onHide={handleHideSidebar} />
         </div>
       </div>

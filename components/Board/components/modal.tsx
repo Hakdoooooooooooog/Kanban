@@ -1,78 +1,168 @@
 import { Menu, Toggle } from "@base-ui-components/react";
-import React from "react";
+import React, { useEffect } from "react";
 import DottedMenu from "../../SVGIcons/DottedMenu";
 import "./modal.css";
+import { Tasks } from "..";
 
-const Modal = () => {
+const Modal = ({
+  isOpen,
+  onClose,
+  task,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+  task: Tasks;
+}) => {
+  const [selectedStatus, setSelectedStatus] = React.useState(
+    task.columnName || "To Do"
+  );
+
+  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Only close if the click was on the backdrop itself, not the content
+    if (e.target === e.currentTarget) {
+      e.preventDefault();
+      e.stopPropagation();
+      onClose();
+    }
+  };
+
+  useEffect(() => {
+    const handleEscKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        onClose();
+      }
+    };
+
+    document.addEventListener("keydown", handleEscKey);
+    return () => document.removeEventListener("keydown", handleEscKey);
+  }, [isOpen, onClose]);
+
+  if (!isOpen) return null;
+
   return (
-    // Modal Container
-    <div className="fixed inset-0 flex items-center justify-center bg-black/50">
+    <div
+      className="fixed inset-0 flex items-center justify-center bg-black/50"
+      onClick={handleBackdropClick}
+    >
       {/* Content Container */}
-      <div className="flex flex-col gap-4 bg-white dark:bg-gray-800 rounded-md p-8 w-[480px] m-auto">
+      <div
+        className="flex flex-col gap-4 bg-white dark:bg-gray-800 rounded-md p-8 w-[480px] m-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="flex items-center justify-between ">
           <h2 className="text-lg font-semibold text-black dark:text-white">
-            Modal Title
+            {task.title || "Task Title"}
           </h2>
           <DottedMenu />
         </div>
         <p className="text-sm text-gray-500 dark:text-gray-300">
-          Modal Content
+          {task.description || "No description provided."}
         </p>
         <div className="flex flex-col gap-4 mt-2">
-          <h3 className="text-sm font-bold text-gray-500 dark:text-gray-300">
-            Subtasks (0 of 1)
-          </h3>
           {/* Subtasks */}
-          <div className="flex items-center gap-3 p-3 bg-gray-100 dark:bg-gray-900 rounded-md">
-            <Toggle
-              className="toggle"
-              render={(props, state) => {
-                if (state.pressed) {
-                  return (
-                    <button type="button" {...props}>
-                      <CheckedIcon />
-                    </button>
-                  );
-                }
-
-                return (
-                  <button type="button" {...props}>
-                    <UncheckedIcon />
-                  </button>
-                );
-              }}
-            />
-            <p className="text-sm font-bold text-black dark:text-white">
-              Research pricing points of various competitors and trial different
-              business models
-            </p>
-          </div>
+          <Subtasks subtasks={task.subtasks || []} />
 
           <div className="w-full flex flex-col gap-2">
             <h3 className="text-sm font-bold text-gray-400 dark:text-gray-500">
               Current Status
             </h3>
-            <Menu.Root>
-              <Menu.Trigger className="menu-btn">
-                TODO <ChevronDownIcon className="inline-block ml-2" />
-              </Menu.Trigger>
-              <Menu.Portal>
-                <Menu.Positioner className={"outline-0"} sideOffset={8}>
-                  <Menu.Popup className={"popup"}>
-                    <Menu.Arrow className={"arrow"}>
-                      <ArrowSvg />
-                    </Menu.Arrow>
-                    <Menu.Item className="menu-item">In Progress</Menu.Item>
-                    <Menu.Item className="menu-item">Done</Menu.Item>
-                    <Menu.Item className="menu-item">Archived</Menu.Item>
-                  </Menu.Popup>
-                </Menu.Positioner>
-              </Menu.Portal>
-            </Menu.Root>
+            <Dropdown
+              options={["Todo", "In Progress", "Done"]}
+              selected={selectedStatus}
+              onSelect={(value) => {
+                setSelectedStatus(value);
+                // Handle status change logic here
+                console.log("Status changed to:", value);
+              }}
+            />
           </div>
         </div>
       </div>
     </div>
+  );
+};
+
+const Dropdown = ({
+  options,
+  selected,
+  onSelect,
+}: {
+  options: string[];
+  selected: string;
+  onSelect: (value: string) => void;
+}) => {
+  return (
+    <Menu.Root>
+      <Menu.Trigger className="menu-btn">
+        {selected} <ChevronDownIcon className="inline-block ml-2" />
+      </Menu.Trigger>
+      <Menu.Portal>
+        <Menu.Positioner className={"outline-0"} sideOffset={8}>
+          <Menu.Popup className={"popup"}>
+            <Menu.Arrow className={"arrow"}>
+              <ArrowSvg />
+            </Menu.Arrow>
+            {options.map((option) => (
+              <Menu.Item
+                key={option}
+                className="menu-item"
+                onClick={() => onSelect(option)}
+              >
+                {option}
+              </Menu.Item>
+            ))}
+          </Menu.Popup>
+        </Menu.Positioner>
+      </Menu.Portal>
+    </Menu.Root>
+  );
+};
+
+const Subtasks = ({ subtasks }: { subtasks: Tasks["subtasks"] }) => {
+  return subtasks && subtasks.length > 0 ? (
+    <div className="flex flex-col gap-4 mt-2">
+      <h3 className="text-sm font-bold text-gray-500 dark:text-gray-300">
+        Subtasks (
+        {subtasks.filter((subtask) => subtask.isCompleted).length || 0} of{" "}
+        {subtasks.length || 0})
+      </h3>
+      {subtasks.map((subtask, index) => (
+        <div
+          key={index}
+          className="flex items-center gap-3 p-3 bg-gray-100 dark:bg-gray-900 rounded-md"
+        >
+          <Toggle
+            className="toggle"
+            render={(props, state) => {
+              if (state.pressed || subtask.isCompleted) {
+                return (
+                  <button type="button" {...props}>
+                    <CheckedIcon />
+                  </button>
+                );
+              }
+
+              return (
+                <button type="button" {...props}>
+                  <UncheckedIcon />
+                </button>
+              );
+            }}
+          />
+          <p
+            className={`text-sm font-bold text-black dark:text-white ${
+              subtask.isCompleted ? "line-through" : ""
+            }`}
+          >
+            {subtask.title || "No title provided."}
+          </p>
+        </div>
+      ))}
+    </div>
+  ) : (
+    <p className="text-sm text-gray-500 dark:text-gray-400">
+      No subtasks available.
+    </p>
   );
 };
 
