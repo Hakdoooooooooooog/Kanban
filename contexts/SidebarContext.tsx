@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, JSX, useContext, useState } from "react";
 
 interface SidebarContextType {
   isSidebarHidden: boolean;
@@ -9,7 +9,7 @@ const SidebarContext = createContext<SidebarContextType | undefined>(undefined);
 
 export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
-}) => {
+}): JSX.Element => {
   const [isSidebarHidden, setIsSidebarHidden] = useState(false);
 
   const setSidebarHidden = (hidden: boolean) => {
@@ -23,7 +23,7 @@ export const SidebarProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-export const useSidebar = () => {
+export const useSidebar = (): SidebarContextType => {
   const context = useContext(SidebarContext);
   if (context === undefined) {
     throw new Error("useSidebar must be used within a SidebarProvider");

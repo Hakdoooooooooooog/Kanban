@@ -33,9 +33,29 @@ const Board = () => {
   }
 
   return (
-    <section className="w-full h-[calc(100dvh-73px)] relative overflow-x-scroll bg-gray-900 dark:bg-gray-200 p-4">
-      <div className="h-full flex gap-4 transition-all duration-400 ease-in-out">
+    <section className="w-full h-[calc(100dvh-73px)] relative overflow-x-auto overflow-y-hidden custom-scrollbar bg-gray-900 dark:bg-gray-200 p-4">
+      <div className="h-full flex gap-4 transition-all duration-400 ease-in-out min-w-max">
         <Column progress="TODO" count={SampleTasks.length}>
+          {SampleTasks.map((task, index) => (
+            <Card
+              key={index}
+              title={task.title}
+              description={task.description}
+              subtasks={task.subtasks}
+            />
+          ))}
+        </Column>
+        <Column progress="In Progress" count={SampleTasks.length}>
+          {SampleTasks.map((task, index) => (
+            <Card
+              key={index}
+              title={task.title}
+              description={task.description}
+              subtasks={task.subtasks}
+            />
+          ))}
+        </Column>
+        <Column progress="Done" count={SampleTasks.length}>
           {SampleTasks.map((task, index) => (
             <Card
               key={index}
@@ -97,7 +117,7 @@ const Column = ({
   children: React.ReactNode;
 }) => {
   return (
-    <div className="w-full max-w-[280px]">
+    <div className="w-[280px] flex-shrink-0">
       <h3 className="text-md font-semibold mb-2 text-white dark:text-black">
         <span className="inline-flex items-center">
           {progress === "TODO" && (
@@ -125,7 +145,7 @@ const Column = ({
 
 const AddColumn = () => {
   return (
-    <div className="w-full flex flex-col items-center justify-center max-w-[280px] p-4 bg-gray-800/30 dark:bg-gray-400/30 rounded-md mt-9">
+    <div className="w-[280px] flex-shrink-0 flex flex-col items-center justify-center p-4 bg-gray-800/30 dark:bg-gray-400/30 rounded-md mt-9">
       <h4 className="text-lg text-gray-300 dark:text-gray-500 font-semibold">
         + New Column
       </h4>

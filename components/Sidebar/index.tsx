@@ -9,7 +9,7 @@ import ThemeToggle from "../ThemeToggle";
 import SidebarFooter from "./components/SidebarFooter";
 
 const Sidebar = () => {
-  const [theme, setTheme] = React.useState("light");
+  const [theme, setTheme] = React.useState<string>("light");
   const { setSidebarHidden } = useSidebar();
   const sidebarRef = useRef<HTMLDivElement>(null);
   const showButtonRef = useRef<HTMLButtonElement>(null);
@@ -36,24 +36,21 @@ const Sidebar = () => {
       x: -300,
       duration: 0.4,
       ease: "power2.inOut",
-    })
-
-      // Show the "show sidebar" button after sidebar is hidden
-      .fromTo(
-        showButtonRef.current,
-        {
-          x: -60,
-          opacity: 0,
-          scale: 0.8,
-        },
-        {
-          x: 0,
-          opacity: 1,
-          scale: 1,
-          duration: 0.3,
-          ease: "back.out(1.7)",
-        }
-      );
+    }).fromTo(
+      showButtonRef.current,
+      {
+        x: -60,
+        opacity: 0,
+        scale: 0.8,
+      },
+      {
+        x: 0,
+        opacity: 1,
+        scale: 1,
+        duration: 0.3,
+        ease: "back.out(1.7)",
+      }
+    );
   };
 
   const handleShowSidebar = () => {
@@ -61,25 +58,21 @@ const Sidebar = () => {
 
     const tl = gsap.timeline();
 
-    // Hide the show button first
     tl.to(showButtonRef.current, {
       x: -60,
       opacity: 0,
       scale: 0.8,
       duration: 0.2,
       ease: "power2.in",
-    })
-      // Then animate sidebar back in
-      .to(sidebarRef.current, {
-        x: 0,
-        duration: 0.4,
-        ease: "power2.inOut",
-        onComplete: () => setSidebarHidden(false),
-      });
+    }).to(sidebarRef.current, {
+      x: 0,
+      duration: 0.4,
+      ease: "power2.inOut",
+      onComplete: () => setSidebarHidden(false),
+    });
   };
 
   useEffect(() => {
-    // Set initial position for show button
     if (showButtonRef.current) {
       gsap.set(showButtonRef.current, { x: -60, opacity: 0, scale: 0.8 });
     }
