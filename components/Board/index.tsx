@@ -1,33 +1,61 @@
 import Button from "../button";
 
 type Tasks = {
+  id: string;
   title: string;
   description?: string;
-  isCompleted: boolean;
-  subtasks?: Tasks[];
+  progress: Progress;
+  subtasks?: Subtask[];
 };
+
+type Subtask = Tasks & {
+  taskID: Tasks["id"];
+};
+
+enum Progress {
+  TODO = "TODO",
+  IN_PROGRESS = "In Progress",
+  DONE = "Done",
+}
 
 const SampleTasks: Tasks[] = [
   {
+    id: "1",
     title: "Task 1",
     description: "This is the first task",
-    isCompleted: false,
+    progress: Progress.IN_PROGRESS,
     subtasks: [
-      { title: "Subtask 1.1", isCompleted: false },
-      { title: "Subtask 1.2", isCompleted: true },
+      { id: "1.1", taskID: "1", title: "Subtask 1.1", progress: Progress.TODO },
+      { id: "1.2", taskID: "1", title: "Subtask 1.2", progress: Progress.DONE },
     ],
   },
   {
+    id: "2",
     title: "Task 2",
     description: "This is the second task",
-    isCompleted: true,
+    progress: Progress.DONE,
+  },
+  {
+    id: "3",
+    title: "Task 3",
+    description: "This is the third task",
+    progress: Progress.TODO,
+    subtasks: [
+      { id: "3.1", taskID: "3", title: "Subtask 3.1", progress: Progress.TODO },
+      {
+        id: "3.2",
+        taskID: "3",
+        title: "Subtask 3.2",
+        progress: Progress.IN_PROGRESS,
+      },
+    ],
   },
 ];
 
 const Board = () => {
   if (
     SampleTasks.length === 0 ||
-    SampleTasks.every((task) => task.isCompleted)
+    SampleTasks.every((task) => task.subtasks?.length === 0)
   ) {
     return <EmptyBoard />;
   }
@@ -35,36 +63,24 @@ const Board = () => {
   return (
     <section className="w-full h-[calc(100dvh-73px)] relative overflow-x-auto overflow-y-hidden custom-scrollbar bg-gray-900 dark:bg-gray-200 p-4">
       <div className="h-full flex gap-4 transition-all duration-400 ease-in-out min-w-max">
-        <Column progress="TODO" count={SampleTasks.length}>
-          {SampleTasks.map((task, index) => (
-            <Card
-              key={index}
-              title={task.title}
-              description={task.description}
-              subtasks={task.subtasks}
-            />
-          ))}
-        </Column>
-        <Column progress="In Progress" count={SampleTasks.length}>
-          {SampleTasks.map((task, index) => (
-            <Card
-              key={index}
-              title={task.title}
-              description={task.description}
-              subtasks={task.subtasks}
-            />
-          ))}
-        </Column>
-        <Column progress="Done" count={SampleTasks.length}>
-          {SampleTasks.map((task, index) => (
-            <Card
-              key={index}
-              title={task.title}
-              description={task.description}
-              subtasks={task.subtasks}
-            />
-          ))}
-        </Column>
+        {Object.values(Progress).map((progress) => {
+          const tasks = SampleTasks.filter(
+            (task) => task.progress === progress
+          );
+          return (
+            <Column key={progress} progress={progress} count={tasks.length}>
+              {tasks.map((task) => (
+                <Card
+                  key={task.id}
+                  taskID={task.id}
+                  title={task.title}
+                  description={task.description}
+                  subtasks={task.subtasks}
+                />
+              ))}
+            </Column>
+          );
+        })}
         <AddColumn />
       </div>
     </section>
@@ -83,13 +99,15 @@ const EmptyBoard = () => {
 };
 
 const Card = ({
+  taskID,
   title,
   description,
   subtasks,
 }: {
+  taskID?: string;
   title: string;
   description?: string;
-  subtasks?: Tasks[];
+  subtasks?: Subtask[] | undefined;
 }) => {
   return (
     <div className="w-full p-4 bg-gray-800 dark:bg-gray-200 rounded-lg shadow-sm">
@@ -99,8 +117,13 @@ const Card = ({
       {description && <p className="text-sm text-gray-600">{description}</p>}
       {subtasks && (
         <p className="text-sm text-gray-500 mt-2">
-          {subtasks.filter((tasks) => !tasks.isCompleted).length} of{" "}
-          {subtasks.length} subtasks
+          {
+            subtasks.filter(
+              (tasks) =>
+                tasks.progress === Progress.DONE && tasks.taskID === taskID
+            ).length
+          }{" "}
+          of {subtasks.length} subtasks
         </p>
       )}
     </div>
