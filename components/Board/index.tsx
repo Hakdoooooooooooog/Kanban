@@ -1,110 +1,152 @@
+import React from "react";
 import Button from "../button";
+
+type Column = {
+  id: string;
+  name: string;
+  color: string;
+  order: number;
+};
 
 type Tasks = {
   id: string;
   title: string;
   description?: string;
-  progress: Progress;
+  columnName: string;
   subtasks?: Subtask[];
 };
 
 type Subtask = Tasks & {
-  taskID: Tasks["id"];
+  taskId: Tasks["id"];
+  columnName: Tasks["columnName"];
 };
 
-enum Progress {
-  TODO = "TODO",
-  IN_PROGRESS = "In Progress",
-  DONE = "Done",
-}
+// Default columns
+const defaultColumns: Column[] = [
+  { id: "todo", name: "TODO", color: "#49C4E5", order: 0 },
+  { id: "in-progress", name: "In Progress", color: "#635fc7", order: 1 },
+  { id: "done", name: "Done", color: "#67E2AE", order: 2 },
+];
 
 const SampleTasks: Tasks[] = [
   {
     id: "1",
     title: "Task 1",
     description: "This is the first task",
-    progress: Progress.IN_PROGRESS,
+    columnName: "in-progress",
     subtasks: [
-      { id: "1.1", taskID: "1", title: "Subtask 1.1", progress: Progress.TODO },
-      { id: "1.2", taskID: "1", title: "Subtask 1.2", progress: Progress.DONE },
+      { id: "1.1", taskId: "1", title: "Subtask 1.1", columnName: "todo" },
+      { id: "1.2", taskId: "1", title: "Subtask 1.2", columnName: "done" },
     ],
   },
   {
     id: "2",
     title: "Task 2",
     description: "This is the second task",
-    progress: Progress.DONE,
+    columnName: "done",
   },
   {
     id: "3",
     title: "Task 3",
     description: "This is the third task",
-    progress: Progress.TODO,
+    columnName: "todo",
     subtasks: [
-      { id: "3.1", taskID: "3", title: "Subtask 3.1", progress: Progress.TODO },
+      { id: "3.1", taskId: "3", title: "Subtask 3.1", columnName: "todo" },
       {
         id: "3.2",
-        taskID: "3",
+        taskId: "3",
         title: "Subtask 3.2",
-        progress: Progress.IN_PROGRESS,
+        columnName: "in-progress",
       },
     ],
   },
 ];
 
 const Board = () => {
-  if (
-    SampleTasks.length === 0 ||
-    SampleTasks.every((task) => task.subtasks?.length === 0)
-  ) {
-    return <EmptyBoard />;
+  const [columns, setColumns] = React.useState<Column[]>(defaultColumns);
+
+  const addNewColumn = (name: string, color: string) => {
+    const newColumn: Column = {
+      id: `column-${Date.now()}`,
+      name,
+      color,
+      order: columns.length,
+    };
+    setColumns([...columns, newColumn]);
+  };
+
+  if (SampleTasks.length === 0) {
+    return <EmptyBoard onAddColumn={addNewColumn} />;
   }
 
   return (
     <section className="w-full h-[calc(100dvh-73px)] relative overflow-x-auto overflow-y-hidden custom-scrollbar bg-gray-900 dark:bg-gray-200 p-4">
       <div className="h-full flex gap-4 transition-all duration-400 ease-in-out min-w-max">
-        {Object.values(Progress).map((progress) => {
-          const tasks = SampleTasks.filter(
-            (task) => task.progress === progress
-          );
-          return (
-            <Column key={progress} progress={progress} count={tasks.length}>
-              {tasks.map((task) => (
-                <Card
-                  key={task.id}
-                  taskID={task.id}
-                  title={task.title}
-                  description={task.description}
-                  subtasks={task.subtasks}
-                />
-              ))}
-            </Column>
-          );
-        })}
-        <AddColumn />
+        {columns
+          .sort((a, b) => a.order - b.order)
+          .map((column) => {
+            const tasks = SampleTasks.filter(
+              (task) => task.columnName === column.id
+            );
+            return (
+              <Column key={column.id} column={column} count={tasks.length}>
+                {tasks.map((task) => (
+                  <Card
+                    key={task.id}
+                    taskId={task.id}
+                    title={task.title}
+                    description={task.description}
+                    subtasks={task.subtasks}
+                  />
+                ))}
+              </Column>
+            );
+          })}
+        <AddColumn onAddColumn={addNewColumn} />
       </div>
     </section>
   );
 };
 
-const EmptyBoard = () => {
+const EmptyBoard = ({
+  onAddColumn,
+}: {
+  onAddColumn: (name: string, color: string) => void;
+}) => {
+  const handleAddColumn = () => {
+    // For demo purposes, we'll add a default column
+    const columnName = prompt("Enter column name:") || "New Column";
+    const colors = [
+      "#49C4E5",
+      "#635fc7",
+      "#67E2AE",
+      "#F39C12",
+      "#E74C3C",
+      "#9B59B6",
+      "#1ABC9C",
+    ];
+
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    onAddColumn(columnName, randomColor);
+  };
+
   return (
     <div className="min-h-full flex items-center justify-center">
       <h2 className="text-lg font-bold p-4">
         This board is empty. Create a new column to get started.
       </h2>
-      <Button>+ Add New Column</Button>
+      <Button onClick={handleAddColumn}>+ Add New Column</Button>
     </div>
   );
 };
 
 const Card = ({
-  taskID,
+  taskId,
   title,
   description,
   subtasks,
 }: {
-  taskID?: string;
+  taskId?: string;
   title: string;
   description?: string;
   subtasks?: Subtask[] | undefined;
@@ -119,11 +161,10 @@ const Card = ({
         <p className="text-sm text-gray-500 mt-2">
           {
             subtasks.filter(
-              (tasks) =>
-                tasks.progress === Progress.DONE && tasks.taskID === taskID
+              (tasks) => tasks.columnName === "done" && tasks.taskId === taskId
             ).length
           }{" "}
-          of {subtasks.length} subtasks
+          of {subtasks.length} subtasks completed
         </p>
       )}
     </div>
@@ -131,38 +172,55 @@ const Card = ({
 };
 
 const Column = ({
-  progress,
+  column,
   count,
   children,
 }: {
-  progress: Progress;
+  column: Column;
   count: number;
   children: React.ReactNode;
 }) => {
-  const progressColors: Record<Progress, string> = {
-    [Progress.TODO]: "#49C4E5",
-    [Progress.IN_PROGRESS]: "#635fc7",
-    [Progress.DONE]: "#67E2AE",
-  };
-
   return (
     <div className="w-[280px] flex-shrink-0">
       <h3 className="text-md font-semibold mb-2 text-white dark:text-black">
         <span className="inline-flex items-center">
           <svg className="w-3 h-3 inline-block mr-2" viewBox="0 0 12 12">
-            <circle cx="6" cy="6" r="5" fill={progressColors[progress]} />
+            <circle cx="6" cy="6" r="5" fill={column.color} />
           </svg>
         </span>
-        {progress} ({count})
+        {column.name} ({count})
       </h3>
       <div className="flex flex-col gap-2">{children}</div>
     </div>
   );
 };
 
-const AddColumn = () => {
+const AddColumn = ({
+  onAddColumn,
+}: {
+  onAddColumn: (name: string, color: string) => void;
+}) => {
+  const handleClick = () => {
+    // For demo purposes, we'll add a default column
+    const columnName = prompt("Enter column name:") || "New Column";
+    const colors = [
+      "#49C4E5",
+      "#635fc7",
+      "#67E2AE",
+      "#F39C12",
+      "#E74C3C",
+      "#9B59B6",
+      "#1ABC9C",
+    ];
+    const randomColor = colors[Math.floor(Math.random() * colors.length)];
+    onAddColumn(columnName, randomColor);
+  };
+
   return (
-    <div className="w-[280px] flex-shrink-0 flex flex-col items-center justify-center p-4 bg-gray-800/30 dark:bg-gray-400/30 rounded-md mt-9">
+    <div
+      className="w-[280px] flex-shrink-0 flex flex-col items-center justify-center p-4 bg-gray-800/30 dark:bg-gray-400/30 rounded-md mt-9 cursor-pointer hover:bg-gray-800/50 dark:hover:bg-gray-400/50 transition-colors"
+      onClick={handleClick}
+    >
       <h4 className="text-lg text-gray-300 dark:text-gray-500 font-semibold">
         + New Column
       </h4>
