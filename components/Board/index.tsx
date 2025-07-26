@@ -218,7 +218,7 @@ const AddColumn = ({
 
   return (
     <div
-      className="w-[280px] flex-shrink-0 flex flex-col items-center justify-center p-4 bg-gray-800/30 dark:bg-gray-400/30 rounded-md mt-9 cursor-pointer hover:bg-gray-800/50 dark:hover:bg-gray-400/50 transition-colors"
+      className="w-[280px] flex-shrink-0 flex flex-col items-center justify-center p-4 bg-gray-800/30 dark:bg-gray-400/30 rounded-md mt-8 cursor-pointer hover:bg-gray-800/50 dark:hover:bg-gray-400/50 transition-colors"
       onClick={handleClick}
     >
       <h4 className="text-lg text-gray-300 dark:text-gray-500 font-semibold">
