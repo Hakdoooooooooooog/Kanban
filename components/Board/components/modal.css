@@ -53,11 +53,11 @@
     width: 100%;
 
     &:active {
-      @apply bg-gray-700 dark:bg-gray-200;
+      @apply bg-gray-200 dark:bg-gray-700;
     }
 
     &[data-popup-open] {
-      @apply bg-gray-800 dark:bg-gray-200;
+      @apply bg-gray-200 dark:bg-gray-800;
       border-color: var(--color-primary);
     }
 

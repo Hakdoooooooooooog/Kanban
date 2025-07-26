@@ -8,22 +8,22 @@ const Modal = () => {
     // Modal Container
     <div className="fixed inset-0 flex items-center justify-center bg-black/50">
       {/* Content Container */}
-      <div className="flex flex-col gap-4 bg-gray-800 dark:bg-white rounded-md p-8 w-[480px] m-auto">
+      <div className="flex flex-col gap-4 bg-white dark:bg-gray-800 rounded-md p-8 w-[480px] m-auto">
         <div className="flex items-center justify-between ">
-          <h2 className="text-lg font-semibold text-white dark:text-black">
+          <h2 className="text-lg font-semibold text-black dark:text-white">
             Modal Title
           </h2>
           <DottedMenu />
         </div>
-        <p className="text-sm text-gray-300 dark:text-gray-500">
+        <p className="text-sm text-gray-500 dark:text-gray-300">
           Modal Content
         </p>
         <div className="flex flex-col gap-4 mt-2">
-          <h3 className="text-sm font-bold text-gray-300 dark:text-gray-500">
+          <h3 className="text-sm font-bold text-gray-500 dark:text-gray-300">
             Subtasks (0 of 1)
           </h3>
           {/* Subtasks */}
-          <div className="flex items-center gap-3 p-3 bg-gray-900 dark:bg-gray-100 rounded-md">
+          <div className="flex items-center gap-3 p-3 bg-gray-100 dark:bg-gray-900 rounded-md">
             <Toggle
               className="toggle"
               render={(props, state) => {
@@ -42,14 +42,14 @@ const Modal = () => {
                 );
               }}
             />
-            <p className="text-sm font-bold text-white dark:text-black">
+            <p className="text-sm font-bold text-black dark:text-white">
               Research pricing points of various competitors and trial different
               business models
             </p>
           </div>
 
           <div className="w-full flex flex-col gap-2">
-            <h3 className="text-sm font-bold text-gray-500 dark:text-gray-400">
+            <h3 className="text-sm font-bold text-gray-400 dark:text-gray-500">
               Current Status
             </h3>
             <Menu.Root>

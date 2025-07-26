@@ -100,7 +100,7 @@ const Board = () => {
   }
 
   return (
-    <section className="w-full h-[calc(100dvh-73px)] relative overflow-x-auto overflow-y-hidden custom-scrollbar bg-gray-900 dark:bg-gray-200 p-4">
+    <section className="w-full h-[calc(100dvh-73px)] relative overflow-x-auto overflow-y-hidden custom-scrollbar bg-gray-200 dark:bg-gray-900 p-4">
       <div className="h-full flex gap-4 transition-all duration-400 ease-in-out min-w-max">
         {columns
           .sort((a, b) => a.order - b.order)
@@ -157,8 +157,8 @@ const EmptyBoard = ({
 
 const Card = ({ id: taskId, title, description, subtasks }: Tasks) => {
   return (
-    <div className="w-full p-4 bg-gray-800 dark:bg-gray-200 rounded-lg shadow-sm">
-      <h4 className="text-md text-white dark:text-black font-semibold">
+    <div className="w-full p-4 bg-gray-200 dark:bg-gray-800 rounded-lg shadow-sm">
+      <h4 className="text-md text-black dark:text-white font-semibold">
         {title}
       </h4>
       {description && <p className="text-sm text-gray-600">{description}</p>}
@@ -190,7 +190,7 @@ const Column = ({
 }) => {
   return (
     <div className="w-[280px] flex-shrink-0">
-      <h3 className="text-md font-semibold mb-2 text-white dark:text-black">
+      <h3 className="text-md font-semibold mb-2 text-black dark:text-white">
         <span className="inline-flex items-center">
           <svg className="w-3 h-3 inline-block mr-2" viewBox="0 0 12 12">
             <circle cx="6" cy="6" r="5" fill={column.color} />
@@ -229,7 +229,7 @@ const AddColumn = ({
       className="w-[280px] flex-shrink-0 flex flex-col items-center justify-center p-4 bg-gray-800/30 dark:bg-gray-400/30 rounded-md mt-8 cursor-pointer hover:bg-gray-800/50 dark:hover:bg-gray-400/50 transition-colors"
       onClick={handleClick}
     >
-      <h4 className="text-lg text-gray-300 dark:text-gray-500 font-semibold">
+      <h4 className="text-lg text-gray-500 dark:text-gray-300 font-semibold">
         + New Column
       </h4>
     </div>

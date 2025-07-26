@@ -10,7 +10,7 @@ interface ThemeToggleProps {
 
 const ThemeToggle = ({ theme, onToggle }: ThemeToggleProps) => {
   return (
-    <div className="w-full flex items-center justify-center gap-4 p-2 bg-gray-900 dark:bg-gray-200 rounded mx-auto">
+    <div className="w-full flex items-center justify-center gap-4 p-2 bg-gray-200 dark:bg-gray-900 rounded mx-auto">
       <LightIcon className="icon" />
       <Switch.Root
         checked={theme === "dark"}
