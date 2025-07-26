@@ -1,0 +1,162 @@
+@import "tailwindcss";
+
+@custom-variant light (&:where(.light, .light *));
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer components {
+  .toggle {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1rem;
+    height: 1rem;
+    padding: 0;
+    margin: 0;
+    outline: 0;
+    border: 0;
+    border-radius: 0.25rem;
+    background-color: transparent;
+    color: var(--color-gray-600);
+    user-select: none;
+    transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+
+    &:focus-visible {
+      background-color: transparent;
+      outline: 2px solid var(--color-blue);
+      outline-offset: -1px;
+    }
+
+    &:hover {
+      background-color: var(--color-gray-100);
+    }
+
+    &:active {
+      background-color: var(--color-primary);
+    }
+
+    &[data-pressed] {
+      background-color: var(--color-primary);
+      color: var(--color-gray-900);
+    }
+  }
+
+  .menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: transparent;
+    color: white;
+    border: 1px solid var(--color-gray-400);
+    padding: 0.5rem 1rem;
+    border-radius: 0.375rem;
+    width: 100%;
+
+    &:active {
+      @apply bg-gray-700 dark:bg-gray-200;
+    }
+
+    &[data-popup-open] {
+      @apply bg-gray-800 dark:bg-gray-200;
+      border-color: var(--color-primary);
+    }
+
+    &:focus-visible {
+      border-color: var(--color-primary);
+    }
+
+    @variant dark {
+      color: black;
+      border-color: var(--color-gray-600);
+    }
+  }
+
+  .popup {
+    box-sizing: border-box;
+    padding-block: 0.25rem;
+    border-radius: 0.375rem;
+    background-color: var(--color-gray-900);
+    color: var(--color-gray-200);
+    transform-origin: var(--transform-origin);
+    transition: transform 150ms, opacity 150ms;
+    z-index: 1000;
+    position: relative;
+
+    &[data-starting-style],
+    &[data-ending-style] {
+      opacity: 0;
+      transform: scale(0.9);
+    }
+
+    @variant dark {
+      background-color: var(--color-gray-200);
+      color: var(--color-gray-900);
+      outline: 1px solid var(--color-gray-300);
+    }
+  }
+
+  .arrow {
+    &[data-side="top"] {
+      bottom: -7px;
+      rotate: 180deg;
+    }
+
+    &[data-side="bottom"] {
+      top: -7px;
+      rotate: 0deg;
+    }
+
+    &[data-side="left"] {
+      right: -13px;
+      rotate: 90deg;
+    }
+
+    &[data-side="right"] {
+      left: -13px;
+      rotate: -90deg;
+    }
+  }
+
+  .menu-item {
+    width: 400px;
+    outline: 0;
+    cursor: default;
+    user-select: none;
+    padding-block: 0.5rem;
+    padding-left: 1rem;
+    padding-right: 2rem;
+    display: flex;
+    font-size: 0.875rem;
+    line-height: 1rem;
+    position: relative;
+    z-index: 999;
+
+    &[data-highlighted] {
+      position: relative;
+      color: white;
+      z-index: 1000;
+
+      @variants dark {
+        color: black;
+      }
+    }
+
+    &[data-highlighted]::before {
+      content: "";
+      position: absolute;
+      inset-block: 0;
+      inset-inline: 0.25rem;
+      border-radius: 0.25rem;
+      background-color: var(--color-gray-400);
+      z-index: -1;
+    }
+  }
+
+  .arrowFill {
+    fill: var(--color-gray-900);
+
+    @variant dark {
+      fill: var(--color-gray-200);
+    }
+  }
+}

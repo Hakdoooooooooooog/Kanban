@@ -1,5 +1,6 @@
 import React from "react";
 import Button from "../button";
+import Modal from "./components/modal";
 
 type Column = {
   id: string;
@@ -19,6 +20,7 @@ type Tasks = {
 type Subtask = Tasks & {
   taskId: Tasks["id"];
   columnName: Tasks["columnName"];
+  isCompleted?: boolean;
 };
 
 // Default columns
@@ -35,8 +37,20 @@ const SampleTasks: Tasks[] = [
     description: "This is the first task",
     columnName: "in-progress",
     subtasks: [
-      { id: "1.1", taskId: "1", title: "Subtask 1.1", columnName: "todo" },
-      { id: "1.2", taskId: "1", title: "Subtask 1.2", columnName: "done" },
+      {
+        id: "1.1",
+        taskId: "1",
+        title: "Subtask 1.1",
+        columnName: "todo",
+        isCompleted: false,
+      },
+      {
+        id: "1.2",
+        taskId: "1",
+        title: "Subtask 1.2",
+        columnName: "done",
+        isCompleted: true,
+      },
     ],
   },
   {
@@ -51,7 +65,13 @@ const SampleTasks: Tasks[] = [
     description: "This is the third task",
     columnName: "todo",
     subtasks: [
-      { id: "3.1", taskId: "3", title: "Subtask 3.1", columnName: "todo" },
+      {
+        id: "3.1",
+        taskId: "3",
+        title: "Subtask 3.1",
+        columnName: "todo",
+        isCompleted: false,
+      },
       {
         id: "3.2",
         taskId: "3",
@@ -91,18 +111,13 @@ const Board = () => {
             return (
               <Column key={column.id} column={column} count={tasks.length}>
                 {tasks.map((task) => (
-                  <Card
-                    key={task.id}
-                    taskId={task.id}
-                    title={task.title}
-                    description={task.description}
-                    subtasks={task.subtasks}
-                  />
+                  <Card key={task.id} {...task} />
                 ))}
               </Column>
             );
           })}
         <AddColumn onAddColumn={addNewColumn} />
+        <Modal />
       </div>
     </section>
   );
@@ -140,17 +155,7 @@ const EmptyBoard = ({
   );
 };
 
-const Card = ({
-  taskId,
-  title,
-  description,
-  subtasks,
-}: {
-  taskId?: string;
-  title: string;
-  description?: string;
-  subtasks?: Subtask[] | undefined;
-}) => {
+const Card = ({ id: taskId, title, description, subtasks }: Tasks) => {
   return (
     <div className="w-full p-4 bg-gray-800 dark:bg-gray-200 rounded-lg shadow-sm">
       <h4 className="text-md text-white dark:text-black font-semibold">
@@ -161,7 +166,10 @@ const Card = ({
         <p className="text-sm text-gray-500 mt-2">
           {
             subtasks.filter(
-              (tasks) => tasks.columnName === "done" && tasks.taskId === taskId
+              (tasks) =>
+                tasks.columnName === "done" &&
+                tasks.taskId === taskId &&
+                tasks.isCompleted
             ).length
           }{" "}
           of {subtasks.length} subtasks completed
