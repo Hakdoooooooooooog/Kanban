@@ -135,29 +135,23 @@ const Column = ({
   count,
   children,
 }: {
-  progress: string;
+  progress: Progress;
   count: number;
   children: React.ReactNode;
 }) => {
+  const progressColors: Record<Progress, string> = {
+    [Progress.TODO]: "#49C4E5",
+    [Progress.IN_PROGRESS]: "#635fc7",
+    [Progress.DONE]: "#67E2AE",
+  };
+
   return (
     <div className="w-[280px] flex-shrink-0">
       <h3 className="text-md font-semibold mb-2 text-white dark:text-black">
         <span className="inline-flex items-center">
-          {progress === "TODO" && (
-            <svg className="w-3 h-3 inline-block mr-2" viewBox="0 0 12 12">
-              <circle cx="6" cy="6" r="5" fill="#49C4E5" />
-            </svg>
-          )}
-          {progress === "In Progress" && (
-            <svg className="w-3 h-3 inline-block mr-2" viewBox="0 0 12 12">
-              <circle cx="6" cy="6" r="5" fill="#635fc7" />
-            </svg>
-          )}
-          {progress === "Done" && (
-            <svg className="w-3 h-3 inline-block mr-2" viewBox="0 0 12 12">
-              <circle cx="6" cy="6" r="5" fill="#67E2AE" />
-            </svg>
-          )}
+          <svg className="w-3 h-3 inline-block mr-2" viewBox="0 0 12 12">
+            <circle cx="6" cy="6" r="5" fill={progressColors[progress]} />
+          </svg>
         </span>
         {progress} ({count})
       </h3>
