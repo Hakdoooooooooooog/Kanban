@@ -10,7 +10,9 @@ export type Tasks = {
   subtasks?: Subtask[];
 };
 
-type Subtask = Tasks & {
+export type Subtask = {
+  id: string;
+  title: string;
   isCompleted?: boolean;
 };
 
@@ -22,11 +24,7 @@ type TasksStore = {
   updateTask: (taskId: string, updatedTask: Partial<Tasks>) => void;
   getTaskById: (taskId: string) => Tasks | undefined;
   getTasksByColumnId: (columnId: string) => Tasks[];
-  setSubtaskIsCompleted: (
-    taskId: string,
-    subtaskId: string,
-    isCompleted: boolean
-  ) => void;
+  setSubtaskCompletion: (taskId: string, subtaskId: string) => void;
 };
 
 export const useTasksStore = create<TasksStore>((set, get) => ({
@@ -50,18 +48,16 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
     get().tasks.find((task) => task.id === taskId),
   getTasksByColumnId: (columnId: string) =>
     get().tasks.filter((task) => task.columnId === columnId),
-  setSubtaskIsCompleted: (
-    taskId: string,
-    subtaskId: string,
-    isCompleted: boolean
-  ) =>
+  setSubtaskCompletion: (taskId: string, subtaskId: string) =>
     set((state) => ({
       tasks: state.tasks.map((task) =>
         task.id === taskId
           ? {
               ...task,
               subtasks: task.subtasks?.map((subtask) =>
-                subtask.id === subtaskId ? { ...subtask, isCompleted } : subtask
+                subtask.id === subtaskId
+                  ? { ...subtask, isCompleted: !subtask.isCompleted }
+                  : subtask
               ),
             }
           : task

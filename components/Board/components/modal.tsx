@@ -1,10 +1,11 @@
-import { Menu, Toggle } from "@base-ui-components/react";
 import React, { useEffect } from "react";
 import DottedMenu from "../../SVGIcons/DottedMenu";
 import "./modal.css";
-import { Tasks, useTasksStore } from "@/kanban/lib/useTasksStore";
+import { useTasksStore } from "@/kanban/lib/useTasksStore";
 import { useModalStore } from "@/kanban/lib/store/useModalStore";
 import { useShallow } from "zustand/shallow";
+import Dropdown from "./Dropdown";
+import Subtasks from "./Subtasks";
 
 const Modal = ({
   isOpen,
@@ -14,26 +15,31 @@ const Modal = ({
   onClose: () => void;
 }) => {
   const [selectedStatus, setSelectedStatus] = React.useState("Todo");
-  const { getTaskById } = useTasksStore(
+  const { setSubtaskCompletion } = useTasksStore(
     useShallow((state) => ({
-      getTaskById: state.getTaskById,
+      setSubtaskCompletion: state.setSubtaskCompletion,
     }))
   );
-
-  const [task, setTask] = React.useState<Tasks>({
-    id: "",
-    boardId: "",
-    title: "",
-    description: "",
-    columnId: "",
-    subtasks: [],
-  });
 
   const { modal } = useModalStore(
     useShallow((state) => ({
       modal: state.modal,
     }))
   );
+
+  const currentTaskId =
+    modal.data && typeof modal.data === "string" ? modal.data : "";
+
+  const task = useTasksStore((state) =>
+    currentTaskId ? state.getTaskById(currentTaskId) : null
+  ) || {
+    id: "",
+    boardId: "",
+    title: "",
+    description: "",
+    columnId: "",
+    subtasks: [],
+  };
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
@@ -59,17 +65,10 @@ const Modal = ({
   }, [isOpen, onClose]);
 
   useEffect(() => {
-    if (modal.data && typeof modal.data === "string") {
-      const taskData = getTaskById(modal.data);
-
-      console.log("Task ID:", modal.data);
-      console.log("Task Data:", taskData);
-      if (taskData) {
-        setTask(taskData);
-        setSelectedStatus(taskData.columnId);
-      }
+    if (task.columnId) {
+      setSelectedStatus(task.columnId);
     }
-  }, [modal.data, getTaskById]);
+  }, [task.columnId]);
 
   if (!isOpen) return null;
 
@@ -91,7 +90,11 @@ const Modal = ({
         </p>
         <div className="flex flex-col gap-4 ">
           {/* Subtasks */}
-          <Subtasks taskId={task.id} subtasks={task.subtasks || []} />
+          <Subtasks
+            taskId={task.id}
+            subtasks={task.subtasks}
+            onSubtaskToggle={setSubtaskCompletion}
+          />
 
           <div className="w-full flex flex-col gap-2">
             <h3 className="text-sm font-bold text-gray-400 dark:text-gray-500">
@@ -108,156 +111,5 @@ const Modal = ({
     </div>
   );
 };
-
-const Dropdown = ({
-  options,
-  selected,
-  onSelect,
-}: {
-  options: string[];
-  selected: string;
-  onSelect: (value: string) => void;
-}) => {
-  return (
-    <Menu.Root>
-      <Menu.Trigger className="menu-btn">
-        {selected} <ChevronDownIcon className="inline-block ml-2" />
-      </Menu.Trigger>
-      <Menu.Portal>
-        <Menu.Positioner className={"outline-0"} sideOffset={8}>
-          <Menu.Popup className={"popup"}>
-            <Menu.Arrow className={"arrow"}>
-              <ArrowSvg />
-            </Menu.Arrow>
-            {options.map((option) => (
-              <Menu.Item
-                key={option}
-                className="menu-item"
-                onClick={() => onSelect(option)}
-              >
-                {option}
-              </Menu.Item>
-            ))}
-          </Menu.Popup>
-        </Menu.Positioner>
-      </Menu.Portal>
-    </Menu.Root>
-  );
-};
-
-const Subtasks = ({
-  taskId,
-  subtasks,
-}: {
-  taskId: string;
-  subtasks: Tasks["subtasks"];
-}) => {
-  return subtasks && subtasks.length > 0 ? (
-    <div className="flex flex-col gap-4 mt-2">
-      <h3 className="text-sm font-bold text-gray-500 dark:text-gray-300">
-        Subtasks (
-        {subtasks.filter((subtask) => subtask.isCompleted).length || 0} of{" "}
-        {subtasks.length || 0})
-      </h3>
-      {subtasks.map((subtask, index) => (
-        <div
-          key={index}
-          className="flex items-center gap-3 p-3 bg-gray-100 dark:bg-gray-900 rounded-md"
-        >
-          <Toggle
-            className="toggle"
-            render={(props, state) => {
-              if (state.pressed || subtask.isCompleted) {
-                return (
-                  <button type="button" {...props}>
-                    <CheckedIcon />
-                  </button>
-                );
-              }
-
-              return (
-                <button type="button" {...props}>
-                  <UncheckedIcon />
-                </button>
-              );
-            }}
-          />
-          <p
-            className={`text-sm font-bold text-black dark:text-white ${
-              subtask.isCompleted ? "line-through !text-gray-600" : ""
-            }`}
-          >
-            {subtask.title || "No title provided."}
-          </p>
-        </div>
-      ))}
-    </div>
-  ) : (
-    <p className="text-sm text-gray-500 dark:text-gray-400">
-      No subtasks available.
-    </p>
-  );
-};
-
-const ArrowSvg = (props: React.ComponentProps<"svg">) => {
-  return (
-    <svg width="20" height="10" viewBox="0 0 20 10" fill="none" {...props}>
-      <path
-        d="M9.66437 2.60207L4.80758 6.97318C4.07308 7.63423 3.11989 8 2.13172 8H0V10H20V8H18.5349C17.5468 8 16.5936 7.63423 15.8591 6.97318L11.0023 2.60207C10.622 2.2598 10.0447 2.25979 9.66437 2.60207Z"
-        className="arrowFill"
-      />
-    </svg>
-  );
-};
-
-const ChevronDownIcon = (props: React.ComponentProps<"svg">) => {
-  return (
-    <svg width="10" height="10" viewBox="0 0 10 10" fill="none" {...props}>
-      <path d="M1 3.5L5 7.5L9 3.5" stroke="currentcolor" strokeWidth="1.5" />
-    </svg>
-  );
-};
-
-const CheckedIcon = (props: React.ComponentProps<"svg">) => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 16 16"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    {...props}
-  >
-    <rect width="16" height="16" rx="2" fill="var(--color-primary)" />
-    <path
-      d="M4.5 8L7 10.5L11.5 6"
-      stroke="white"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);
-
-const UncheckedIcon = (props: React.ComponentProps<"svg">) => (
-  <svg
-    width="16"
-    height="16"
-    viewBox="0 0 16 16"
-    fill="none"
-    xmlns="http://www.w3.org/2000/svg"
-    {...props}
-  >
-    <rect
-      x="1"
-      y="1"
-      width="14"
-      height="14"
-      rx="2"
-      stroke="var(--color-gray-500)"
-      strokeWidth="1"
-      fill="none"
-    />
-  </svg>
-);
 
 export default Modal;
