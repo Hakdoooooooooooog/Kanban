@@ -116,11 +116,7 @@ const Modal = ({
               Current Status
             </h3>
             <Dropdown
-              options={[
-                TaskStatus.TODO,
-                TaskStatus.IN_PROGRESS,
-                TaskStatus.DONE,
-              ]}
+              options={[...Object.values(TaskStatus)]}
               selected={task.columnId || selectedStatus}
               onSelect={handleSelectChange}
             />
