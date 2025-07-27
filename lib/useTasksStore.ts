@@ -13,7 +13,7 @@ export type Tasks = {
 export type Subtask = {
   id: string;
   title: string;
-  isCompleted: boolean;
+  isCompleted?: boolean;
 };
 
 type TasksStore = {
