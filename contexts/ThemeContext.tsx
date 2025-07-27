@@ -1,34 +1,19 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { useEffect } from "react";
+import useThemeStore from "../lib/useThemeStore";
 
 type Theme = "light" | "dark";
 
-type ThemeContextType = {
-  theme: Theme;
-  toggleTheme: () => void;
-  setTheme: (theme: Theme) => void;
-};
+// Export the useTheme hook that directly uses the store
+export const useTheme = () => {
+  const {
+    theme,
+    setTheme: setStoreTheme,
+    toggleTheme: toggleStoreTheme,
+  } = useThemeStore();
 
-const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
-
-export const useTheme = (): ThemeContextType => {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error("useTheme must be used within a ThemeProvider");
-  }
-  return context;
-};
-
-type ThemeProviderProps = {
-  children: React.ReactNode;
-};
-
-export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const [theme, setThemeState] = useState<Theme>("light");
-  const [mounted, setMounted] = useState(false);
-
-  const applyTheme = (newTheme: Theme) => {
+  const applyTheme = (newTheme: string) => {
     if (typeof window !== "undefined") {
       const html = document.documentElement;
       html.classList.remove("light", "dark");
@@ -36,55 +21,67 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     }
   };
 
-  // Initialize theme after component mounts to avoid hydration issues
-  useEffect(() => {
-    setMounted(true);
-
-    if (typeof window !== "undefined") {
-      // Read the theme that was already applied by the inline script
-      const html = document.documentElement;
-      const appliedTheme = html.classList.contains("dark") ? "dark" : "light";
-      setThemeState(appliedTheme);
-    }
-  }, []);
-
   const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme);
+    setStoreTheme(newTheme);
     applyTheme(newTheme);
-    localStorage.setItem("theme", newTheme);
   };
 
   const toggleTheme = () => {
+    toggleStoreTheme();
+    // Apply the new theme after toggle
     const newTheme = theme === "light" ? "dark" : "light";
-    setTheme(newTheme);
+    applyTheme(newTheme);
   };
+
+  return {
+    theme: theme as Theme,
+    setTheme,
+    toggleTheme,
+  };
+};
+
+type ThemeProviderProps = {
+  children: React.ReactNode;
+};
+
+// Simplified provider that just handles initial theme application
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
+  const { theme } = useThemeStore();
+
+  // Apply theme on mount and when theme changes
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const html = document.documentElement;
+
+      // Read the theme that was already applied by the inline script
+      const appliedTheme = html.classList.contains("dark") ? "dark" : "light";
+
+      // If store theme doesn't match applied theme, apply the store theme
+      if (theme !== appliedTheme) {
+        html.classList.remove("light", "dark");
+        html.classList.add(theme);
+      }
+    }
+  }, [theme]);
 
   // Listen for system theme changes
   useEffect(() => {
-    if (typeof window === "undefined" || !mounted) return;
+    if (typeof window === "undefined") return;
 
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
 
     const handleChange = (e: MediaQueryListEvent) => {
       // Only update if no theme is stored in localStorage
-      if (!localStorage.getItem("theme")) {
+      const storedTheme = localStorage.getItem("theme-storage");
+      if (!storedTheme) {
         const newTheme = e.matches ? "dark" : "light";
-        setThemeState(newTheme);
-        applyTheme(newTheme);
+        useThemeStore.getState().setTheme(newTheme);
       }
     };
 
     mediaQuery.addEventListener("change", handleChange);
     return () => mediaQuery.removeEventListener("change", handleChange);
-  }, [mounted]);
+  }, []);
 
-  const value: ThemeContextType = {
-    theme,
-    toggleTheme,
-    setTheme,
-  };
-
-  return (
-    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
-  );
+  return <>{children}</>;
 };
