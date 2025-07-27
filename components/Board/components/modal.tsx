@@ -3,7 +3,7 @@ import DottedMenu from "../../SVGIcons/DottedMenu";
 import "./modal.css";
 import { useTasksStore } from "@/kanban/lib/store/useTasksStore";
 import { useModalStore } from "@/kanban/lib/store/useModalStore";
-import { TaskStatus } from "@/kanban/lib/store/useColumnStore";
+import { useColumnStore } from "@/kanban/lib/store/useColumnStore";
 import { useShallow } from "zustand/shallow";
 import Dropdown from "./Dropdown";
 import Subtasks from "./Subtasks";
@@ -20,6 +20,12 @@ const Modal = ({
     useShallow((state) => ({
       updateTaskStatus: state.updateTaskStatus,
       setSubtaskCompletion: state.setSubtaskCompletion,
+    }))
+  );
+
+  const { columns } = useColumnStore(
+    useShallow((state) => ({
+      columns: state.columns,
     }))
   );
 
@@ -52,6 +58,12 @@ const Modal = ({
       onClose();
     }
   };
+
+  // Create dropdown options with display labels and values
+  const dropdownOptions = columns.map((column) => ({
+    label: column.status,
+    value: column.id,
+  }));
 
   const handleSelectChange = (value: string) => {
     console.log("Status change requested:", {
@@ -116,7 +128,7 @@ const Modal = ({
               Current Status
             </h3>
             <Dropdown
-              options={[...Object.values(TaskStatus)]}
+              options={dropdownOptions}
               selected={task.columnId || selectedStatus}
               onSelect={handleSelectChange}
             />

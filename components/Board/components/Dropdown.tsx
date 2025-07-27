@@ -1,18 +1,43 @@
 import { Menu } from "@base-ui-components/react";
 
+type DropdownOption =
+  | {
+      label: string;
+      value: string;
+    }
+  | string;
+
 const Dropdown = ({
   options,
   selected,
   onSelect,
 }: {
-  options: string[];
+  options: DropdownOption[];
   selected: string;
   onSelect: (value: string) => void;
 }) => {
+  // Helper function to get the display label
+  const getLabel = (option: DropdownOption) => {
+    return typeof option === "string" ? option : option.label;
+  };
+
+  // Helper function to get the value
+  const getValue = (option: DropdownOption) => {
+    return typeof option === "string" ? option : option.value;
+  };
+
+  // Get the display label for the selected value
+  const getSelectedLabel = () => {
+    const selectedOption = options.find(
+      (option) => getValue(option) === selected
+    );
+    return selectedOption ? getLabel(selectedOption) : selected;
+  };
+
   return (
     <Menu.Root>
       <Menu.Trigger className="menu-btn">
-        {selected} <ChevronDownIcon className="inline-block ml-2" />
+        {getSelectedLabel()} <ChevronDownIcon className="inline-block ml-2" />
       </Menu.Trigger>
       <Menu.Portal>
         <Menu.Positioner className={"outline-0"} sideOffset={8}>
@@ -20,13 +45,13 @@ const Dropdown = ({
             <Menu.Arrow className={"arrow"}>
               <ArrowSvg />
             </Menu.Arrow>
-            {options.map((option) => (
+            {options.map((option, index) => (
               <Menu.Item
-                key={option}
+                key={getValue(option) || index}
                 className="menu-item"
-                onClick={() => onSelect(option)}
+                onClick={() => onSelect(getValue(option))}
               >
-                {option}
+                {getLabel(option)}
               </Menu.Item>
             ))}
           </Menu.Popup>
