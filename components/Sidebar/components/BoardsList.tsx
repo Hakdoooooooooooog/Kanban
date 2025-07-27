@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import FluentBoardSplit24Regular from "../../SVGIcons/FluentBoardSplit24Regular";
-import { BoardStore } from "@/kanban/lib/useBoardStore";
+import { BoardStore } from "@/kanban/lib/store/useBoardStore";
 
 // Skeleton component for loading state
 const BoardSkeleton = () => (

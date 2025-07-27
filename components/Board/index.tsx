@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from "react";
 import Button from "../button";
 import Modal from "./components/modal";
-import { Tasks, useTasksStore } from "@/kanban/lib/useTasksStore";
+import { Tasks, useTasksStore } from "@/kanban/lib/store/useTasksStore";
 import { useShallow } from "zustand/shallow";
-import { useColumnStore, type Column } from "@/kanban/lib/useColumnStore";
+import { useColumnStore, type Column } from "@/kanban/lib/store/useColumnStore";
 import { replaceSpacesWithDashes } from "@/kanban/lib/utils";
 import { ModalType, useModalStore } from "@/kanban/lib/store/useModalStore";
 import BoardSkeleton from "./components/Skeleton";

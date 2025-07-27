@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import DottedMenu from "../../SVGIcons/DottedMenu";
 import "./modal.css";
-import { useTasksStore } from "@/kanban/lib/useTasksStore";
+import { useTasksStore } from "@/kanban/lib/store/useTasksStore";
 import { useModalStore } from "@/kanban/lib/store/useModalStore";
-import { TaskStatus } from "@/kanban/lib/useColumnStore";
+import { TaskStatus } from "@/kanban/lib/store/useColumnStore";
 import { useShallow } from "zustand/shallow";
 import Dropdown from "./Dropdown";
 import Subtasks from "./Subtasks";

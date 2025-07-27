@@ -6,9 +6,9 @@ import SidebarHeader from "./components/SidebarHeader";
 import BoardsList from "./components/BoardsList";
 import ThemeToggle from "../ThemeToggle";
 import SidebarFooter from "./components/SidebarFooter";
-import { Board, useBoardStore } from "@/kanban/lib/useBoardStore";
+import { Board, useBoardStore } from "@/kanban/lib/store/useBoardStore";
 import { useShallow } from "zustand/shallow";
-import useSidebarStore from "@/kanban/lib/useSidebarStore";
+import useSidebarStore from "@/kanban/lib/store/useSidebarStore";
 
 const boardItems: Board[] = [
   { id: "1", name: "Board 1", isActive: true },

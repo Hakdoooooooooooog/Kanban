@@ -2,7 +2,7 @@
 
 import React, { useRef, useEffect } from "react";
 import { gsap } from "gsap";
-import useSidebarStore from "../lib/useSidebarStore";
+import useSidebarStore from "../lib/store/useSidebarStore";
 
 interface MainContentProps {
   children: React.ReactNode;

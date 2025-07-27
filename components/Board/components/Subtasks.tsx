@@ -1,4 +1,4 @@
-import { Subtask } from "@/kanban/lib/useTasksStore";
+import { Subtask } from "@/kanban/lib/store/useTasksStore";
 import { Toggle } from "@base-ui-components/react";
 
 const Subtasks = ({

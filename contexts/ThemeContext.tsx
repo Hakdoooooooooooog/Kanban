@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect } from "react";
-import useThemeStore from "../lib/useThemeStore";
+import useThemeStore from "../lib/store/useThemeStore";
 
 type Theme = "light" | "dark";
 
