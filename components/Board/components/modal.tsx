@@ -18,7 +18,6 @@ const Modal = ({
   );
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    // Only close if the click was on the backdrop itself, not the content
     if (e.target === e.currentTarget) {
       e.preventDefault();
       e.stopPropagation();
@@ -45,10 +44,7 @@ const Modal = ({
       onClick={handleBackdropClick}
     >
       {/* Content Container */}
-      <div
-        className="flex flex-col gap-4 bg-white dark:bg-gray-800 rounded-md p-8 w-[480px] m-auto"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="flex flex-col gap-4 bg-white dark:bg-gray-800 rounded-md p-8 w-[480px] m-auto">
         <div className="flex items-center justify-between ">
           <h2 className="text-lg font-semibold text-black dark:text-white">
             {task.title || "Task Title"}
@@ -58,7 +54,7 @@ const Modal = ({
         <p className="text-sm text-gray-500 dark:text-gray-300">
           {task.description || "No description provided."}
         </p>
-        <div className="flex flex-col gap-4 mt-2">
+        <div className="flex flex-col gap-4 ">
           {/* Subtasks */}
           <Subtasks subtasks={task.subtasks || []} />
 
@@ -151,7 +147,7 @@ const Subtasks = ({ subtasks }: { subtasks: Tasks["subtasks"] }) => {
           />
           <p
             className={`text-sm font-bold text-black dark:text-white ${
-              subtask.isCompleted ? "line-through" : ""
+              subtask.isCompleted ? "line-through !text-gray-600" : ""
             }`}
           >
             {subtask.title || "No title provided."}
