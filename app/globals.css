@@ -76,8 +76,27 @@
     }
   }
 
-  .active {
-    @apply !text-white bg-primary font-bold;
+  .item {
+    @apply w-full flex items-center gap-2 p-2 text-gray-400 pl-10 rounded-r-full cursor-pointer;
+
+    &.active {
+      @apply !text-white bg-primary font-bold;
+
+      & .icon {
+        color: var(--color-white);
+      }
+    }
+
+    @variant not-[.active] {
+      @apply text-gray-400 hover:bg-gray-300/30;
+      &:hover {
+        @apply text-white;
+
+        & .icon {
+          color: var(--color-white);
+        }
+      }
+    }
   }
 
   .switch {
@@ -119,8 +138,8 @@
     scrollbar-color: var(--color-gray-500) transparent;
 
     &::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
+      width: 5px;
+      height: 5px;
     }
 
     &::-webkit-scrollbar-thumb {

@@ -9,7 +9,7 @@ import Board from "../components/Board";
 export default function Home() {
   return (
     <SidebarProvider>
-      <div className="flex min-h-screen relative overflow-hidden">
+      <div className="flex min-h-screen relative overflow-hidden custom-scrollbar">
         <Sidebar />
         <MainContent>
           <Header />

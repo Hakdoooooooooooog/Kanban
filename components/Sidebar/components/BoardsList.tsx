@@ -22,7 +22,7 @@ const BoardsList = ({
 }: BoardsListProps) => {
   return (
     <div className="w-[95%] h-full flex flex-col gap-2 my-auto">
-      <p className="text-sm text-gray-500 p-4 pl-10 dark:text-gray-400">
+      <p className="text-sm text-gray-500 p-2 pl-10 dark:text-gray-400">
         ALL BOARDS
         <span className="ml-2">({boards.length})</span>
       </p>
@@ -37,16 +37,16 @@ const BoardsList = ({
                 // Handle board selection logic here
                 console.log(`Selected board: ${board.name}`);
               }}
-              className={`w-full flex items-center gap-2 p-4 text-gray-400 pl-10 hover:not-[.active]:bg-gray-300/30 rounded-r-full cursor-pointer ${
-                board.isActive ? "active" : ""
-              }`}
+              className={`item ${board.isActive ? "active" : ""}`}
             >
-              <FluentBoardSplit24Regular className="icon" />
+              <FluentBoardSplit24Regular props={{ className: "icon" }} />
               <span className="text-sm">{board.name}</span>
             </li>
           ))}
           <li className="w-full flex items-center gap-2 p-4 text-primary pl-10">
-            <FluentBoardSplit24Regular className="icon text-primary" />
+            <FluentBoardSplit24Regular
+              props={{ className: "icon text-primary" }}
+            />
             <span
               className="text-sm cursor-pointer"
               onClick={

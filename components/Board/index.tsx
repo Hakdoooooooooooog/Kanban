@@ -107,7 +107,7 @@ const Board = () => {
   }
 
   return (
-    <section className="w-full h-[calc(100dvh-73px)] relative overflow-x-auto overflow-y-hidden custom-scrollbar bg-gray-200 dark:bg-gray-900 p-4">
+    <section className="w-full h-[calc(100dvh-73px)] relative overflow-x-auto overflow-y-hidden bg-gray-200 dark:bg-gray-900 p-4">
       <div className="h-full flex gap-4 transition-all duration-400 ease-in-out min-w-max">
         {columns
           .sort((a, b) => a.order - b.order)

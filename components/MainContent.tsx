@@ -30,14 +30,14 @@ const MainContent = ({ children }: MainContentProps) => {
   }, [isSidebarHidden]);
 
   return (
-    <div
+    <main
       ref={contentRef}
       className={`"flex-1 transition-all duration-400 ease-in-out" ${
         isSidebarHidden ? "ml-0 w-full" : "ml-[300px] w-[calc(100vw-300px)]"
       }`}
     >
       {children}
-    </div>
+    </main>
   );
 };
 

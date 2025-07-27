@@ -74,9 +74,9 @@ const Sidebar = () => {
   return (
     <>
       {/* Main Sidebar */}
-      <div
+      <nav
         ref={sidebarRef}
-        className="fixed left-0 top-0 w-[300px] h-full bg-gray-100 dark:bg-gray-800 flex flex-col gap-4 border-r border-r-gray-200 dark:border-r-gray-50 z-10"
+        className="absolute left-0 top-0 w-[300px] h-full bg-gray-100 dark:bg-gray-800 flex flex-col gap-4 border-r border-r-gray-200 dark:border-r-gray-50 z-10"
         style={{ transform: "translateX(0px)" }}
       >
         <SidebarHeader />
@@ -87,7 +87,7 @@ const Sidebar = () => {
           <ThemeToggle />
           <SidebarFooter onHide={handleHideSidebar} />
         </div>
-      </div>
+      </nav>
 
       {/* Show Sidebar Button - appears when sidebar is hidden */}
       <button

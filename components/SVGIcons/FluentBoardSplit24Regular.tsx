@@ -1,20 +1,11 @@
 const FluentBoardSplit24Regular = ({
-  width = "16",
-  height = "16",
-  className = "",
-  style = {},
+  props,
 }: {
-  width?: string;
-  height?: string;
-  className?: string;
-  style?: React.SVGProps<SVGSVGElement>["style"];
+  props: React.SVGProps<SVGSVGElement>;
 }) => {
   return (
     <svg
-      width={width}
-      height={height}
-      className={className}
-      style={style}
+      {...props}
       viewBox="0 0 16 16"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
