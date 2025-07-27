@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import Button from "../button";
 import Modal from "./components/modal";
@@ -11,6 +13,7 @@ type Column = {
 
 export type Tasks = {
   id: string;
+  boardId: string;
   title: string;
   description?: string;
   columnName: string;
@@ -33,12 +36,14 @@ const defaultColumns: Column[] = [
 const SampleTasks: Tasks[] = [
   {
     id: "1",
+    boardId: "1",
     title: "Task 1",
     description: "This is the first task",
     columnName: "in-progress",
     subtasks: [
       {
         id: "1.1",
+        boardId: "1",
         taskId: "1",
         title: "Subtask 1.1",
         columnName: "todo",
@@ -46,6 +51,7 @@ const SampleTasks: Tasks[] = [
       },
       {
         id: "1.2",
+        boardId: "1",
         taskId: "1",
         title: "Subtask 1.2",
         columnName: "done",
@@ -55,18 +61,21 @@ const SampleTasks: Tasks[] = [
   },
   {
     id: "2",
+    boardId: "1",
     title: "Task 2",
     description: "This is the second task",
     columnName: "done",
   },
   {
     id: "3",
+    boardId: "1",
     title: "Task 3",
     description: "This is the third task",
     columnName: "todo",
     subtasks: [
       {
         id: "3.1",
+        boardId: "1",
         taskId: "3",
         title: "Subtask 3.1",
         columnName: "todo",
@@ -74,6 +83,7 @@ const SampleTasks: Tasks[] = [
       },
       {
         id: "3.2",
+        boardId: "1",
         taskId: "3",
         title: "Subtask 3.2",
         columnName: "in-progress",

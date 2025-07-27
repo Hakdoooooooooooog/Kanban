@@ -2,25 +2,38 @@
 
 import React, { useRef, useEffect } from "react";
 import { gsap } from "gsap";
-import { useSidebar } from "../../contexts/SidebarContext";
 import SidebarHeader from "./components/SidebarHeader";
 import BoardsList from "./components/BoardsList";
 import ThemeToggle from "../ThemeToggle";
 import SidebarFooter from "./components/SidebarFooter";
+import { Board, useBoardStore } from "@/kanban/lib/useBoardStore";
+import { useShallow } from "zustand/shallow";
+import useSidebarStore from "@/kanban/lib/useSidebarStore";
+
+const boardItems: Board[] = [
+  { id: "1", name: "Board 1", isActive: true },
+  { id: "2", name: "Board 2" },
+  { id: "3", name: "Board 3" },
+];
 
 const Sidebar = () => {
-  const { setSidebarHidden } = useSidebar();
+  const { boards, setBoard, setActiveBoard, addBoard } = useBoardStore(
+    useShallow((state) => ({
+      boards: state.boards,
+      setBoard: state.setBoards,
+      setActiveBoard: state.setActiveBoard,
+      addBoard: state.addBoard,
+    }))
+  );
+  const { toggleSidebar } = useSidebarStore();
+
   const sidebarRef = useRef<HTMLDivElement>(null);
   const showButtonRef = useRef<HTMLButtonElement>(null);
-
-  const handleAddBoard = () => {
-    console.log("Add New Board clicked");
-  };
 
   const handleHideSidebar = () => {
     if (!sidebarRef.current || !showButtonRef.current) return;
 
-    setSidebarHidden(true);
+    toggleSidebar();
 
     const tl = gsap.timeline();
 
@@ -61,7 +74,7 @@ const Sidebar = () => {
       x: 0,
       duration: 0.4,
       ease: "power2.inOut",
-      onComplete: () => setSidebarHidden(false),
+      onComplete: () => toggleSidebar(),
     });
   };
 
@@ -70,6 +83,13 @@ const Sidebar = () => {
       gsap.set(showButtonRef.current, { x: -60, opacity: 0, scale: 0.8 });
     }
   }, []);
+
+  useEffect(() => {
+    // Initialize boards if not already set
+    if (!boards || boards.length === 0) {
+      setBoard(boardItems);
+    }
+  }, [boards, setBoard]);
 
   return (
     <>
@@ -81,7 +101,11 @@ const Sidebar = () => {
       >
         <SidebarHeader />
 
-        <BoardsList onAddBoard={handleAddBoard} />
+        <BoardsList
+          boards={boards}
+          addBoard={addBoard}
+          setActiveBoard={setActiveBoard}
+        />
 
         <div className="w-3/4 flex flex-col gap-4 justify-between pb-16 mx-auto">
           <ThemeToggle />

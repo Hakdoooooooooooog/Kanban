@@ -2,14 +2,14 @@
 
 import React, { useRef, useEffect } from "react";
 import { gsap } from "gsap";
-import { useSidebar } from "../contexts/SidebarContext";
+import useSidebarStore from "../lib/useSidebarStore";
 
 interface MainContentProps {
   children: React.ReactNode;
 }
 
 const MainContent = ({ children }: MainContentProps) => {
-  const { isSidebarHidden } = useSidebar();
+  const { isSidebarHidden } = useSidebarStore();
   const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
