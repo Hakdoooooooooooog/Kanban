@@ -5,7 +5,6 @@ import useThemeStore from "../lib/useThemeStore";
 
 type Theme = "light" | "dark";
 
-// Export the useTheme hook that directly uses the store
 export const useTheme = () => {
   const {
     theme,
