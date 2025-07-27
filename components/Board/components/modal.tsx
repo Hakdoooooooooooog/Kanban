@@ -3,6 +3,7 @@ import DottedMenu from "../../SVGIcons/DottedMenu";
 import "./modal.css";
 import { useTasksStore } from "@/kanban/lib/useTasksStore";
 import { useModalStore } from "@/kanban/lib/store/useModalStore";
+import { TaskStatus } from "@/kanban/lib/useColumnStore";
 import { useShallow } from "zustand/shallow";
 import Dropdown from "./Dropdown";
 import Subtasks from "./Subtasks";
@@ -14,9 +15,10 @@ const Modal = ({
   isOpen: boolean;
   onClose: () => void;
 }) => {
-  const [selectedStatus, setSelectedStatus] = React.useState("Todo");
-  const { setSubtaskCompletion } = useTasksStore(
+  const [selectedStatus, setSelectedStatus] = React.useState("TODO");
+  const { setSubtaskCompletion, updateTaskStatus } = useTasksStore(
     useShallow((state) => ({
+      updateTaskStatus: state.updateTaskStatus,
       setSubtaskCompletion: state.setSubtaskCompletion,
     }))
   );
@@ -52,7 +54,17 @@ const Modal = ({
   };
 
   const handleSelectChange = (value: string) => {
+    console.log("Status change requested:", {
+      from: task.columnId,
+      to: value,
+      taskId: currentTaskId,
+    });
     setSelectedStatus(value);
+    // Update the task status when user selects a new option
+    if (currentTaskId && value !== task.columnId) {
+      console.log("Updating task status...");
+      updateTaskStatus(currentTaskId, value);
+    }
   };
 
   useEffect(() => {
@@ -66,6 +78,7 @@ const Modal = ({
     return () => document.removeEventListener("keydown", handleEscKey);
   }, [isOpen, onClose]);
 
+  // Sync selectedStatus with the current task's columnId
   useEffect(() => {
     if (task.columnId) {
       setSelectedStatus(task.columnId);
@@ -103,8 +116,12 @@ const Modal = ({
               Current Status
             </h3>
             <Dropdown
-              options={["Todo", "In Progress", "Done"]}
-              selected={selectedStatus}
+              options={[
+                TaskStatus.TODO,
+                TaskStatus.IN_PROGRESS,
+                TaskStatus.DONE,
+              ]}
+              selected={task.columnId || selectedStatus}
               onSelect={handleSelectChange}
             />
           </div>

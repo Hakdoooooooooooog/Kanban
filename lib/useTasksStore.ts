@@ -22,6 +22,7 @@ type TasksStore = {
   addTask: (task: Tasks) => void;
   removeTask: (taskId: string) => void;
   updateTask: (taskId: string, updatedTask: Partial<Tasks>) => void;
+  updateTaskStatus: (taskId: string, status: string) => void;
   getTaskById: (taskId: string) => Tasks | undefined;
   getTasksByColumnId: (columnId: string) => Tasks[];
   setSubtaskCompletion: (taskId: string, subtaskId: string) => void;
@@ -42,6 +43,12 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
     set((state) => ({
       tasks: state.tasks.map((task) =>
         task.id === taskId ? { ...task, ...updatedTask } : task
+      ),
+    })),
+  updateTaskStatus: (taskId: string, status: string) =>
+    set((state) => ({
+      tasks: state.tasks.map((task) =>
+        task.id === taskId ? { ...task, columnId: status } : task
       ),
     })),
   getTaskById: (taskId: string) =>
