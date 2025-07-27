@@ -61,6 +61,7 @@ const SampleTasks: Tasks[] = [
       {
         id: "3.2",
         title: "Subtask 3.2",
+        isCompleted: false,
       },
     ],
   },
