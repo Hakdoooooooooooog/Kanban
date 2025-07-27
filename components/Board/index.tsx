@@ -29,16 +29,12 @@ const SampleTasks: Tasks[] = [
     subtasks: [
       {
         id: "1.1",
-        boardId: "1",
         title: "Subtask 1.1",
-        columnId: "todo",
         isCompleted: false,
       },
       {
         id: "1.2",
-        boardId: "1",
         title: "Subtask 1.2",
-        columnId: "done",
         isCompleted: true,
       },
     ],
@@ -59,16 +55,12 @@ const SampleTasks: Tasks[] = [
     subtasks: [
       {
         id: "3.1",
-        boardId: "1",
         title: "Subtask 3.1",
-        columnId: "todo",
         isCompleted: false,
       },
       {
         id: "3.2",
-        boardId: "1",
         title: "Subtask 3.2",
-        columnId: "in-progress",
       },
     ],
   },
@@ -208,10 +200,7 @@ const Card = ({ id: taskId, title, description, subtasks }: Tasks) => {
           <p className="text-sm text-gray-500 mt-2">
             {
               subtasks.filter(
-                (tasks) =>
-                  tasks.columnId === "done" &&
-                  tasks.id === taskId &&
-                  tasks.isCompleted
+                (tasks) => tasks.id === taskId && tasks.isCompleted
               ).length
             }{" "}
             of {subtasks.length} subtasks completed

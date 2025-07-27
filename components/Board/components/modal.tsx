@@ -41,6 +41,8 @@ const Modal = ({
     subtasks: [],
   };
 
+  console.log("Current Task:", task);
+
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) {
       e.preventDefault();
