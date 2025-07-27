@@ -2,19 +2,37 @@ import { Menu, Toggle } from "@base-ui-components/react";
 import React, { useEffect } from "react";
 import DottedMenu from "../../SVGIcons/DottedMenu";
 import "./modal.css";
-import { Tasks } from "..";
+import { Tasks, useTasksStore } from "@/kanban/lib/useTasksStore";
+import { useModalStore } from "@/kanban/lib/store/useModalStore";
+import { useShallow } from "zustand/shallow";
 
 const Modal = ({
   isOpen,
   onClose,
-  task,
 }: {
   isOpen: boolean;
   onClose: () => void;
-  task: Tasks;
 }) => {
-  const [selectedStatus, setSelectedStatus] = React.useState(
-    task.columnName || "To Do"
+  const [selectedStatus, setSelectedStatus] = React.useState("Todo");
+  const { getTaskById } = useTasksStore(
+    useShallow((state) => ({
+      getTaskById: state.getTaskById,
+    }))
+  );
+
+  const [task, setTask] = React.useState<Tasks>({
+    id: "",
+    boardId: "",
+    title: "",
+    description: "",
+    columnId: "",
+    subtasks: [],
+  });
+
+  const { modal } = useModalStore(
+    useShallow((state) => ({
+      modal: state.modal,
+    }))
   );
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -23,6 +41,10 @@ const Modal = ({
       e.stopPropagation();
       onClose();
     }
+  };
+
+  const handleSelectChange = (value: string) => {
+    setSelectedStatus(value);
   };
 
   useEffect(() => {
@@ -35,6 +57,19 @@ const Modal = ({
     document.addEventListener("keydown", handleEscKey);
     return () => document.removeEventListener("keydown", handleEscKey);
   }, [isOpen, onClose]);
+
+  useEffect(() => {
+    if (modal.data && typeof modal.data === "string") {
+      const taskData = getTaskById(modal.data);
+
+      console.log("Task ID:", modal.data);
+      console.log("Task Data:", taskData);
+      if (taskData) {
+        setTask(taskData);
+        setSelectedStatus(taskData.columnId);
+      }
+    }
+  }, [modal.data, getTaskById]);
 
   if (!isOpen) return null;
 
@@ -56,7 +91,7 @@ const Modal = ({
         </p>
         <div className="flex flex-col gap-4 ">
           {/* Subtasks */}
-          <Subtasks subtasks={task.subtasks || []} />
+          <Subtasks taskId={task.id} subtasks={task.subtasks || []} />
 
           <div className="w-full flex flex-col gap-2">
             <h3 className="text-sm font-bold text-gray-400 dark:text-gray-500">
@@ -65,11 +100,7 @@ const Modal = ({
             <Dropdown
               options={["Todo", "In Progress", "Done"]}
               selected={selectedStatus}
-              onSelect={(value) => {
-                setSelectedStatus(value);
-                // Handle status change logic here
-                console.log("Status changed to:", value);
-              }}
+              onSelect={handleSelectChange}
             />
           </div>
         </div>
@@ -114,7 +145,13 @@ const Dropdown = ({
   );
 };
 
-const Subtasks = ({ subtasks }: { subtasks: Tasks["subtasks"] }) => {
+const Subtasks = ({
+  taskId,
+  subtasks,
+}: {
+  taskId: string;
+  subtasks: Tasks["subtasks"];
+}) => {
   return subtasks && subtasks.length > 0 ? (
     <div className="flex flex-col gap-4 mt-2">
       <h3 className="text-sm font-bold text-gray-500 dark:text-gray-300">

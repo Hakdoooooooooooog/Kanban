@@ -1,36 +1,22 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Button from "../button";
 import Modal from "./components/modal";
+import { Tasks, useTasksStore } from "@/kanban/lib/useTasksStore";
+import { useShallow } from "zustand/shallow";
+import { useColumnStore, type Column } from "@/kanban/lib/useColumnStore";
+import { replaceSpacesWithDashes } from "@/kanban/lib/utils";
+import { ModalType, useModalStore } from "@/kanban/lib/store/useModalStore";
+import BoardSkeleton from "./components/Skeleton";
 
-type Column = {
-  id: string;
-  name: string;
-  color: string;
-  order: number;
-};
-
-export type Tasks = {
-  id: string;
-  boardId: string;
-  title: string;
-  description?: string;
-  columnName: string;
-  subtasks?: Subtask[];
-};
-
-type Subtask = Tasks & {
-  taskId: Tasks["id"];
-  columnName: Tasks["columnName"];
-  isCompleted?: boolean;
-};
+// Skeleton Components
 
 // Default columns
 const defaultColumns: Column[] = [
-  { id: "todo", name: "TODO", color: "#49C4E5", order: 0 },
-  { id: "in-progress", name: "In Progress", color: "#635fc7", order: 1 },
-  { id: "done", name: "Done", color: "#67E2AE", order: 2 },
+  { id: "todo", status: "TODO", color: "#49C4E5" },
+  { id: "in-progress", status: "IN_PROGRESS", color: "#635fc7" },
+  { id: "done", status: "DONE", color: "#67E2AE" },
 ];
 
 const SampleTasks: Tasks[] = [
@@ -39,22 +25,20 @@ const SampleTasks: Tasks[] = [
     boardId: "1",
     title: "Task 1",
     description: "This is the first task",
-    columnName: "in-progress",
+    columnId: "in-progress",
     subtasks: [
       {
         id: "1.1",
         boardId: "1",
-        taskId: "1",
         title: "Subtask 1.1",
-        columnName: "todo",
+        columnId: "todo",
         isCompleted: false,
       },
       {
         id: "1.2",
         boardId: "1",
-        taskId: "1",
         title: "Subtask 1.2",
-        columnName: "done",
+        columnId: "done",
         isCompleted: true,
       },
     ],
@@ -64,81 +48,93 @@ const SampleTasks: Tasks[] = [
     boardId: "1",
     title: "Task 2",
     description: "This is the second task",
-    columnName: "done",
+    columnId: "done",
   },
   {
     id: "3",
     boardId: "1",
     title: "Task 3",
     description: "This is the third task",
-    columnName: "todo",
+    columnId: "todo",
     subtasks: [
       {
         id: "3.1",
         boardId: "1",
-        taskId: "3",
         title: "Subtask 3.1",
-        columnName: "todo",
+        columnId: "todo",
         isCompleted: false,
       },
       {
         id: "3.2",
         boardId: "1",
-        taskId: "3",
         title: "Subtask 3.2",
-        columnName: "in-progress",
+        columnId: "in-progress",
       },
     ],
   },
 ];
 
 const Board = () => {
-  const [openModalTaskId, setOpenModalTaskId] = React.useState<string | null>(
-    null
+  const [isLoading, setIsLoading] = useState(true);
+
+  const { tasks, setTasks } = useTasksStore(
+    useShallow((state) => ({
+      tasks: state.tasks,
+      setTasks: state.setTasks,
+    }))
   );
-  const [columns, setColumns] = React.useState<Column[]>(defaultColumns);
+  const { columns, setColumns, addNewColumn } = useColumnStore(
+    useShallow((state) => ({
+      columns: state.columns,
+      setColumns: state.setColumns,
+      addNewColumn: state.addColumn,
+    }))
+  );
 
-  const addNewColumn = (name: string, color: string) => {
-    const newColumn: Column = {
-      id: `column-${Date.now()}`,
-      name,
-      color,
-      order: columns.length,
-    };
-    setColumns([...columns, newColumn]);
-  };
+  useEffect(() => {
+    // Show loading state briefly on mount
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 500); // Adjust delay as needed
 
-  const handleCloseModal = () => {
-    setOpenModalTaskId(null);
-  };
+    return () => clearTimeout(timer);
+  }, []);
 
-  if (SampleTasks.length === 0) {
+  useEffect(() => {
+    // Initialize columns if not already set
+    if (columns.length === 0) {
+      setColumns(defaultColumns);
+    }
+
+    // Initialize tasks if not already set
+    if (tasks.length === 0) {
+      setTasks(SampleTasks);
+    }
+  }, [columns, tasks, setColumns, setTasks]);
+
+  // Show skeleton while loading
+  if (isLoading) {
+    return <BoardSkeleton />;
+  }
+
+  if (tasks.length === 0) {
     return <EmptyBoard onAddColumn={addNewColumn} />;
   }
 
   return (
     <section className="w-full h-[calc(100dvh-73px)] relative overflow-x-auto overflow-y-hidden bg-gray-200 dark:bg-gray-900 p-4">
       <div className="h-full flex gap-4 transition-all duration-400 ease-in-out min-w-max">
-        {columns
-          .sort((a, b) => a.order - b.order)
-          .map((column) => {
-            const tasks = SampleTasks.filter(
-              (task) => task.columnName === column.id
-            );
-            return (
-              <Column key={column.id} column={column} count={tasks.length}>
-                {tasks.map((task) => (
-                  <Card
-                    key={task.id}
-                    {...task}
-                    isModalOpen={openModalTaskId === task.id}
-                    onOpenModal={() => setOpenModalTaskId(task.id)}
-                    onCloseModal={handleCloseModal}
-                  />
-                ))}
-              </Column>
-            );
-          })}
+        {columns.map((column) => {
+          const columnTasks = tasks.filter(
+            (task) =>
+              replaceSpacesWithDashes(task.columnId) ===
+              replaceSpacesWithDashes(column.id)
+          );
+
+          return <Column key={column.id} column={column} tasks={columnTasks} />;
+        })}
+
+        {/* Add New Column Button */}
         <AddColumn onAddColumn={addNewColumn} />
       </div>
     </section>
@@ -148,11 +144,11 @@ const Board = () => {
 const EmptyBoard = ({
   onAddColumn,
 }: {
-  onAddColumn: (name: string, color: string) => void;
+  onAddColumn: (column: Column) => void;
 }) => {
   const handleAddColumn = () => {
     // For demo purposes, we'll add a default column
-    const columnName = prompt("Enter column name:") || "New Column";
+    const columnId = prompt("Enter column name:") || "New Column";
     const colors = [
       "#49C4E5",
       "#635fc7",
@@ -164,7 +160,11 @@ const EmptyBoard = ({
     ];
 
     const randomColor = colors[Math.floor(Math.random() * colors.length)];
-    onAddColumn(columnName, randomColor);
+    onAddColumn({
+      id: columnId.toLowerCase().replace(/\s+/g, "-"),
+      status: "TODO",
+      color: randomColor,
+    });
   };
 
   return (
@@ -177,60 +177,58 @@ const EmptyBoard = ({
   );
 };
 
-const Card = ({
-  id: taskId,
-  title,
-  description,
-  subtasks,
-  isModalOpen,
-  onOpenModal,
-  onCloseModal,
-}: Tasks & {
-  isModalOpen: boolean;
-  onOpenModal: () => void;
-  onCloseModal: () => void;
-}) => {
-  return (
-    <div
-      onClick={onOpenModal}
-      className="w-full p-4 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 rounded-lg shadow-sm"
-    >
-      <h4 className="text-md text-black dark:text-white font-semibold">
-        {title}
-      </h4>
-      {description && <p className="text-sm text-gray-600">{description}</p>}
-      {subtasks && (
-        <p className="text-sm text-gray-500 mt-2">
-          {
-            subtasks.filter(
-              (tasks) =>
-                tasks.columnName === "done" &&
-                tasks.taskId === taskId &&
-                tasks.isCompleted
-            ).length
-          }{" "}
-          of {subtasks.length} subtasks completed
-        </p>
-      )}
+const Card = ({ id: taskId, title, description, subtasks }: Tasks) => {
+  const { modal, openModal, closeModal } = useModalStore(
+    useShallow((state) => ({
+      modal: state.modal,
+      openModal: state.openModal,
+      closeModal: state.closeModal,
+    }))
+  );
 
-      <Modal
-        isOpen={isModalOpen}
-        onClose={onCloseModal}
-        task={SampleTasks.find((task) => task.id === taskId) || ({} as Tasks)}
-      />
-    </div>
+  const handleCloseModal = () => {
+    closeModal();
+  };
+
+  const onOpenModal = () => {
+    openModal(ModalType.EDIT_TASK, taskId);
+  };
+
+  return (
+    <>
+      <div
+        onClick={onOpenModal}
+        className="w-full p-4 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 rounded-lg shadow-sm cursor-pointer"
+      >
+        <h4 className="text-md text-black dark:text-white font-semibold">
+          {title}
+        </h4>
+        {description && <p className="text-sm text-gray-600">{description}</p>}
+        {subtasks && (
+          <p className="text-sm text-gray-500 mt-2">
+            {
+              subtasks.filter(
+                (tasks) =>
+                  tasks.columnId === "done" &&
+                  tasks.id === taskId &&
+                  tasks.isCompleted
+              ).length
+            }{" "}
+            of {subtasks.length} subtasks completed
+          </p>
+        )}
+      </div>
+
+      {modal.isModalOpen &&
+        modal.modalType === ModalType.EDIT_TASK &&
+        modal.data === taskId && (
+          <Modal isOpen={modal.isModalOpen} onClose={handleCloseModal} />
+        )}
+    </>
   );
 };
 
-const Column = ({
-  column,
-  count,
-  children,
-}: {
-  column: Column;
-  count: number;
-  children: React.ReactNode;
-}) => {
+const Column = ({ column, tasks }: { column: Column; tasks: Tasks[] }) => {
   return (
     <div className="w-[280px] flex-shrink-0">
       <h3 className="text-md font-semibold mb-2 text-black dark:text-white">
@@ -239,9 +237,13 @@ const Column = ({
             <circle cx="6" cy="6" r="5" fill={column.color} />
           </svg>
         </span>
-        {column.name} ({count})
+        {column.status} ({tasks.length})
       </h3>
-      <div className="flex flex-col gap-2">{children}</div>
+      <div className="flex flex-col gap-2">
+        {tasks.map((task) => (
+          <Card key={task.id} {...task} />
+        ))}
+      </div>
     </div>
   );
 };
@@ -249,11 +251,11 @@ const Column = ({
 const AddColumn = ({
   onAddColumn,
 }: {
-  onAddColumn: (name: string, color: string) => void;
+  onAddColumn: (column: Column) => void;
 }) => {
   const handleClick = () => {
     // For demo purposes, we'll add a default column
-    const columnName = prompt("Enter column name:") || "New Column";
+    const columnId = prompt("Enter column name:") || "New Column";
     const colors = [
       "#49C4E5",
       "#635fc7",
@@ -264,7 +266,11 @@ const AddColumn = ({
       "#1ABC9C",
     ];
     const randomColor = colors[Math.floor(Math.random() * colors.length)];
-    onAddColumn(columnName, randomColor);
+    onAddColumn({
+      id: columnId.toLowerCase().replace(/\s+/g, "-"),
+      status: columnId.toUpperCase().replace(/\s+/g, "_"),
+      color: randomColor,
+    });
   };
 
   return (

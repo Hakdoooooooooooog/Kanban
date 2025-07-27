@@ -34,7 +34,6 @@ const Sidebar = () => {
     if (!sidebarRef.current || !showButtonRef.current) return;
 
     toggleSidebar();
-
     const tl = gsap.timeline();
 
     // Animate sidebar out
@@ -54,7 +53,7 @@ const Sidebar = () => {
         opacity: 1,
         scale: 1,
         duration: 0.3,
-        ease: "back.out(1.7)",
+        ease: "back.out(1)",
       }
     );
   };
@@ -63,17 +62,16 @@ const Sidebar = () => {
     if (!sidebarRef.current || !showButtonRef.current) return;
 
     const tl = gsap.timeline();
-
     tl.to(showButtonRef.current, {
       x: -60,
       opacity: 0,
       scale: 0.8,
       duration: 0.2,
-      ease: "power2.in",
+      ease: "ease.in",
     }).to(sidebarRef.current, {
       x: 0,
       duration: 0.4,
-      ease: "power2.inOut",
+      ease: "ease.out",
       onComplete: () => toggleSidebar(),
     });
   };

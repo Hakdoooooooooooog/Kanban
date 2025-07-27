@@ -1,0 +1,70 @@
+import { create } from "zustand";
+import { Column } from "./useColumnStore";
+
+export type Tasks = {
+  id: string;
+  boardId: string;
+  columnId: Column["id"];
+  title: string;
+  description?: string;
+  subtasks?: Subtask[];
+};
+
+type Subtask = Tasks & {
+  isCompleted?: boolean;
+};
+
+type TasksStore = {
+  tasks: Tasks[];
+  setTasks: (tasks: Tasks[]) => void;
+  addTask: (task: Tasks) => void;
+  removeTask: (taskId: string) => void;
+  updateTask: (taskId: string, updatedTask: Partial<Tasks>) => void;
+  getTaskById: (taskId: string) => Tasks | undefined;
+  getTasksByColumnId: (columnId: string) => Tasks[];
+  setSubtaskIsCompleted: (
+    taskId: string,
+    subtaskId: string,
+    isCompleted: boolean
+  ) => void;
+};
+
+export const useTasksStore = create<TasksStore>((set, get) => ({
+  tasks: [],
+  setTasks: (tasks: Tasks[]) => set({ tasks }),
+  addTask: (task: Tasks) =>
+    set((state) => ({
+      tasks: [...state.tasks, task],
+    })),
+  removeTask: (taskId: string) =>
+    set((state) => ({
+      tasks: state.tasks.filter((task) => task.id !== taskId),
+    })),
+  updateTask: (taskId: string, updatedTask: Partial<Tasks>) =>
+    set((state) => ({
+      tasks: state.tasks.map((task) =>
+        task.id === taskId ? { ...task, ...updatedTask } : task
+      ),
+    })),
+  getTaskById: (taskId: string) =>
+    get().tasks.find((task) => task.id === taskId),
+  getTasksByColumnId: (columnId: string) =>
+    get().tasks.filter((task) => task.columnId === columnId),
+  setSubtaskIsCompleted: (
+    taskId: string,
+    subtaskId: string,
+    isCompleted: boolean
+  ) =>
+    set((state) => ({
+      tasks: state.tasks.map((task) =>
+        task.id === taskId
+          ? {
+              ...task,
+              subtasks: task.subtasks?.map((subtask) =>
+                subtask.id === subtaskId ? { ...subtask, isCompleted } : subtask
+              ),
+            }
+          : task
+      ),
+    })),
+}));
