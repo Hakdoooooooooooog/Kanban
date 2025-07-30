@@ -25,7 +25,7 @@ type TasksStore = {
   updateTask: (taskId: string, updatedTask: Partial<Tasks>) => void;
   updateTaskStatus: (taskId: string, status: string) => void;
   getTaskById: (taskId: string) => Tasks | undefined;
-  getTasksByColumnId: (columnId: string) => Tasks[];
+  getTasksByBoardId: (boardId: string) => Tasks[];
   getSubtasksById: (taskId: string) => Subtask[];
   setSubtaskCompletion: (taskId: string, subtaskId: string) => void;
 };
@@ -55,8 +55,8 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
     })),
   getTaskById: (taskId: string) =>
     get().tasks.find((task) => task.id === taskId),
-  getTasksByColumnId: (columnId: string) =>
-    get().tasks.filter((task) => task.columnId === columnId),
+  getTasksByBoardId: (boardId: string) =>
+    get().tasks.filter((task) => task.boardId === boardId),
   getSubtasksById: (taskId: string) =>
     get().tasks.find((task) => task.id === taskId)?.subtasks || [],
   setSubtaskCompletion: (taskId: string, subtaskId: string) =>

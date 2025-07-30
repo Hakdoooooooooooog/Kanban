@@ -17,9 +17,13 @@ const BoardColumn = memo(
           {column.status} ({tasks.length})
         </h3>
         <div className="flex flex-col gap-2">
-          {tasks.map((task) => (
-            <BoardCard key={task.id} {...task} />
-          ))}
+          {tasks.length === 0 ? (
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              No tasks available in this column.
+            </p>
+          ) : (
+            tasks.map((task) => <BoardCard key={task.id} {...task} />)
+          )}
         </div>
       </div>
     );
@@ -29,7 +33,7 @@ const BoardColumn = memo(
 // Add display name for debugging
 BoardColumn.displayName = "BoardColumn";
 
-export const AddColumn = memo(() => {
+export const AddColumn = memo(({ boardId }: { boardId: string }) => {
   const addNewColumn = useColumnStore((state) => state.addColumn);
 
   const handleClick = useCallback(() => {
@@ -46,10 +50,11 @@ export const AddColumn = memo(() => {
     const randomColor = colors[Math.floor(Math.random() * colors.length)];
     addNewColumn({
       id: generateUUID(),
+      boardId: boardId, // Add the boardId here
       status: columnName.toUpperCase().replace(/\s+/g, "_"),
       color: randomColor,
     });
-  }, [addNewColumn]);
+  }, [addNewColumn, boardId]);
 
   return (
     <div

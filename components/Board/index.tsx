@@ -9,23 +9,22 @@ import { useColumnStore } from "@/kanban/lib/store/useColumnStore";
 import { generateUUID, replaceSpacesWithDashes } from "@/kanban/lib/utils";
 import BoardSkeleton from "./components/Skeleton";
 import BoardColumn, { AddColumn } from "./components/board-column";
-import { defaultColumns, sampleTasks } from "@/kanban/lib/const/board";
 
 const Board = ({ boardId }: { boardId: string }) => {
   const [isLoading, setIsLoading] = useState(true);
 
-  const { tasks, setTasks } = useTasksStore(
-    useShallow((state) => ({
-      tasks: state.tasks,
-      setTasks: state.setTasks,
-    }))
+  const tasks = useTasksStore(
+    useShallow((state) => {
+      if (!state.tasks) return [];
+      return state.getTasksByBoardId(boardId);
+    })
   );
 
-  const { columns, setColumns } = useColumnStore(
-    useShallow((state) => ({
-      columns: state.columns,
-      setColumns: state.setColumns,
-    }))
+  const columns = useColumnStore(
+    useShallow((state) => {
+      if (!state.columns) return [];
+      return state.getColumnById(boardId) || [];
+    })
   );
 
   // Loading state, can be replaced with actual loading logic when fetching data
@@ -37,19 +36,13 @@ const Board = ({ boardId }: { boardId: string }) => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Initialize columns and tasks if not already set, remove this if using real data fetching
-  useEffect(() => {
-    setColumns(defaultColumns.filter((column) => column.boardId === boardId));
-    setTasks(sampleTasks.filter((task) => task.boardId === boardId));
-  }, [boardId, setColumns, setTasks]);
-
   // Show skeleton while loading
   if (isLoading) {
     return <BoardSkeleton />;
   }
 
-  if (tasks.length === 0 && columns.length === 0) {
-    return <EmptyBoard />;
+  if (columns.length === 0) {
+    return <EmptyBoard boardId={boardId} />;
   }
 
   return (
@@ -67,7 +60,7 @@ const Board = ({ boardId }: { boardId: string }) => {
           );
         })}
 
-        <AddColumn />
+        <AddColumn boardId={boardId} />
       </div>
 
       <ModalRenderer />
@@ -75,7 +68,7 @@ const Board = ({ boardId }: { boardId: string }) => {
   );
 };
 
-const EmptyBoard = () => {
+const EmptyBoard = ({ boardId }: { boardId: string }) => {
   const { addNewColumn } = useColumnStore(
     useShallow((state) => ({
       addNewColumn: state.addColumn,
@@ -97,7 +90,14 @@ const EmptyBoard = () => {
     const randomColor = colors[Math.floor(Math.random() * colors.length)];
     addNewColumn({
       id: generateUUID(),
-      boardId: "1", // Assuming boardId is "1" for simplicity
+      boardId: boardId,
+      status: columnName.toUpperCase().replace(/\s+/g, "_"),
+      color: randomColor,
+    });
+
+    console.log("New column added:", {
+      id: generateUUID(),
+      boardId: boardId,
       status: columnName.toUpperCase().replace(/\s+/g, "_"),
       color: randomColor,
     });
