@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useCallback, useState } from "react";
 import DottedMenu from "../../../SVGIcons/DottedMenu";
 import "./modal.css";
 import { useTasksStore } from "@/kanban/lib/store/useTasksStore";
@@ -41,28 +41,26 @@ const ModalRenderer = () => {
     return () => document.removeEventListener("keydown", handleEscKey);
   }, [modal.isModalOpen, closeModal]);
 
-  // Don't render anything if modal is not open
-  if (!modal.isModalOpen || !modal.modalType) {
-    return null;
-  }
-
   // Render modal content based on type
-  const renderModalContent = () => {
+  const renderModalContent = useMemo(() => {
     switch (modal.modalType) {
       case ModalType.EDIT_TASK:
+        return <EditTaskContent modal={modal} columns={columns} />;
       case ModalType.ADD_TASK:
         return <EditTaskContent modal={modal} columns={columns} />;
-
       case ModalType.ADD_BOARD:
       case ModalType.EDIT_BOARD:
       case ModalType.ADD_COLUMN:
       case ModalType.EDIT_COLUMN:
-        return <PlaceholderContent modalType={modal.modalType} />;
-
       default:
-        return null;
+        return <PlaceholderContent modalType={modal.modalType} />;
     }
-  };
+  }, [modal, columns]);
+
+  // Don't render anything if modal is not open
+  if (!modal.isModalOpen || !modal.modalType) {
+    return null;
+  }
 
   return (
     <div
@@ -70,7 +68,7 @@ const ModalRenderer = () => {
       onClick={handleBackdropClick}
     >
       <div className="flex flex-col gap-4 bg-white dark:bg-gray-800 rounded-md p-8 w-[480px] m-auto">
-        {renderModalContent()}
+        {renderModalContent}
       </div>
     </div>
   );
@@ -83,7 +81,7 @@ const EditTaskContent = ({
   modal: ModalState;
   columns: Column[];
 }) => {
-  const [selectedStatus, setSelectedStatus] = React.useState("TODO");
+  const [selectedStatus, setSelectedStatus] = useState("TODO");
   const { setSubtaskCompletion, updateTaskStatus } = useTasksStore(
     useShallow((state) => ({
       updateTaskStatus: state.updateTaskStatus,
@@ -92,7 +90,7 @@ const EditTaskContent = ({
   );
 
   const currentTaskId =
-    modal.data && typeof modal.data === "string" ? modal.data : "";
+    modal.data && typeof modal.data === "string" ? modal.data : undefined;
 
   const task = useTasksStore((state) =>
     currentTaskId ? state.getTaskById(currentTaskId) : null
@@ -104,26 +102,24 @@ const EditTaskContent = ({
     columnId: "",
     subtasks: [],
   };
+  const dropdownOptions = useCallback(() => {
+    return columns.map((column) => ({
+      label: column.status,
+      value: column.id,
+    }));
+  }, [columns]);
 
-  // Create dropdown options with display labels and values
-  const dropdownOptions = columns.map((column) => ({
-    label: column.status,
-    value: column.id,
-  }));
+  const handleSelectChange = useCallback(
+    (value: string) => {
+      setSelectedStatus(value);
 
-  const handleSelectChange = (value: string) => {
-    console.log("Status change requested:", {
-      from: task.columnId,
-      to: value,
-      taskId: currentTaskId,
-    });
-    setSelectedStatus(value);
-
-    // Update the task status when user selects a new option
-    if (currentTaskId && value !== task.columnId) {
-      updateTaskStatus(currentTaskId, value);
-    }
-  };
+      // Update the task status when user selects a new option
+      if (currentTaskId && value !== task.columnId) {
+        updateTaskStatus(currentTaskId, value);
+      }
+    },
+    [currentTaskId, task.columnId, updateTaskStatus]
+  );
 
   // Sync selectedStatus with the current task's columnId
   useEffect(() => {
@@ -156,7 +152,7 @@ const EditTaskContent = ({
             Current Status
           </h3>
           <Dropdown
-            options={dropdownOptions}
+            options={dropdownOptions()}
             selected={task.columnId || selectedStatus}
             onSelect={handleSelectChange}
           />
@@ -167,10 +163,10 @@ const EditTaskContent = ({
 };
 
 // Placeholder Content for unimplemented modals
-const PlaceholderContent = ({ modalType }: { modalType: string }) => (
+const PlaceholderContent = ({ modalType }: { modalType: string | null }) => (
   <div className="text-center">
     <h2 className="text-lg font-semibold mb-4 text-black dark:text-white">
-      {modalType} Modal
+      {modalType || "Unknown"} Modal
     </h2>
     <p className="text-gray-600 dark:text-gray-400">
       This modal type is not implemented yet.
