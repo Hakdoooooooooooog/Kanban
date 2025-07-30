@@ -9,6 +9,7 @@ import { useColumnStore } from "@/kanban/lib/store/useColumnStore";
 import { generateUUID, replaceSpacesWithDashes } from "@/kanban/lib/utils";
 import BoardSkeleton from "./components/Skeleton";
 import BoardColumn, { AddColumn } from "./components/board-column";
+import { defaultColumns, sampleTasks } from "@/kanban/lib/const/board";
 
 const Board = ({ boardId }: { boardId: string }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -27,6 +28,10 @@ const Board = ({ boardId }: { boardId: string }) => {
     })
   );
 
+  const setTasks = useTasksStore(useShallow((state) => state.setTasks));
+
+  const setColumns = useColumnStore(useShallow((state) => state.setColumns));
+
   // Loading state, can be replaced with actual loading logic when fetching data
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -36,12 +41,22 @@ const Board = ({ boardId }: { boardId: string }) => {
     return () => clearTimeout(timer);
   }, []);
 
+  // Initialize columns and tasks if they are empty
+  useEffect(() => {
+    if (columns.length === 0) {
+      setColumns(defaultColumns);
+    }
+    if (tasks.length === 0) {
+      setTasks(sampleTasks);
+    }
+  }, [columns, tasks, setColumns, setTasks]);
+
   // Show skeleton while loading
   if (isLoading) {
     return <BoardSkeleton />;
   }
 
-  if (columns.length === 0) {
+  if (columns.length === 0 && tasks.length === 0) {
     return <EmptyBoard boardId={boardId} />;
   }
 
