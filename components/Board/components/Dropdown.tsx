@@ -1,44 +1,24 @@
 import { Menu } from "@base-ui-components/react";
 import { useMemo } from "react";
 
-type DropdownOption =
-  | {
-      label: string;
-      value: string;
-    }
-  | string;
-
 const Dropdown = ({
   options,
   selected,
   onSelect,
 }: {
-  options: DropdownOption[];
+  options: string[];
   selected: string;
   onSelect: (value: string) => void;
 }) => {
-  // Helper function to get the display label
-  const getLabel = (option: DropdownOption) => {
-    return typeof option === "string" ? option : option.label;
-  };
-
-  // Helper function to get the value
-  const getValue = (option: DropdownOption) => {
-    return typeof option === "string" ? option : option.value;
-  };
-
-  // Get the display label for the selected value
-  const getSelectedLabel = useMemo(() => {
-    const selectedOption = options.find(
-      (option) => getValue(option) === selected
-    );
-    return selectedOption ? getLabel(selectedOption) : selected;
+  const getSelectedValue = useMemo(() => {
+    const selectedOption = options.find((option) => option === selected);
+    return selectedOption ? selectedOption : options[0];
   }, [options, selected]);
 
   return (
     <Menu.Root>
       <Menu.Trigger className="menu-btn">
-        {getSelectedLabel} <ChevronDownIcon className="inline-block ml-2" />
+        {getSelectedValue} <ChevronDownIcon className="inline-block ml-2" />
       </Menu.Trigger>
       <Menu.Portal>
         <Menu.Positioner className={"outline-0"} sideOffset={8}>
@@ -48,11 +28,11 @@ const Dropdown = ({
             </Menu.Arrow>
             {options.map((option, index) => (
               <Menu.Item
-                key={getValue(option) || index}
+                key={index}
                 className="menu-item"
-                onClick={() => onSelect(getValue(option))}
+                onClick={() => onSelect(option)}
               >
-                {getLabel(option)}
+                {option}
               </Menu.Item>
             ))}
           </Menu.Popup>

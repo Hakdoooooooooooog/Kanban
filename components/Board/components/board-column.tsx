@@ -33,7 +33,6 @@ export const AddColumn = memo(() => {
   const addNewColumn = useColumnStore((state) => state.addColumn);
 
   const handleClick = useCallback(() => {
-    // For demo purposes, we'll add a default column
     const columnName = prompt("Enter column name:") || "New Column";
     const colors = [
       "#49C4E5",

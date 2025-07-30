@@ -98,29 +98,29 @@ const EditTaskContent = ({
     })
   );
 
-  const dropdownOptions = useMemo(() => {
-    return columns.map((column) => ({
-      label: column.status,
-      value: column.id,
-    }));
-  }, [columns]);
-
   const handleSelectChange = useCallback(
     (value: string) => {
       setSelectedStatus(value);
 
       // Update the task status when user selects a new option
       if (currentTaskId && task && value !== task.columnId) {
-        updateTaskStatus(currentTaskId, value);
+        const columnIndex = columns.findIndex(
+          (column) => column.status === value
+        );
+
+        if (columnIndex !== -1) {
+          const newColumnId = columns[columnIndex].id;
+          updateTaskStatus(currentTaskId, newColumnId);
+        }
       }
     },
-    [currentTaskId, task, updateTaskStatus]
+    [currentTaskId, task, updateTaskStatus, columns]
   );
 
   // Sync selectedStatus with the current task's columnId
   useEffect(() => {
     if (task && task.columnId) {
-      setSelectedStatus(task.columnId);
+      setSelectedStatus(task.columnId || "TODO");
     }
   }, [task]);
 
@@ -149,7 +149,7 @@ const EditTaskContent = ({
             Current Status
           </h3>
           <Dropdown
-            options={dropdownOptions}
+            options={columns.map((column) => column.status)}
             selected={task.columnId || selectedStatus}
             onSelect={handleSelectChange}
           />
