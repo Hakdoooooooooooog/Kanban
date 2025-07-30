@@ -1,4 +1,5 @@
 import { Menu } from "@base-ui-components/react";
+import { useMemo } from "react";
 
 type DropdownOption =
   | {
@@ -27,17 +28,17 @@ const Dropdown = ({
   };
 
   // Get the display label for the selected value
-  const getSelectedLabel = () => {
+  const getSelectedLabel = useMemo(() => {
     const selectedOption = options.find(
       (option) => getValue(option) === selected
     );
     return selectedOption ? getLabel(selectedOption) : selected;
-  };
+  }, [options, selected]);
 
   return (
     <Menu.Root>
       <Menu.Trigger className="menu-btn">
-        {getSelectedLabel()} <ChevronDownIcon className="inline-block ml-2" />
+        {getSelectedLabel} <ChevronDownIcon className="inline-block ml-2" />
       </Menu.Trigger>
       <Menu.Portal>
         <Menu.Positioner className={"outline-0"} sideOffset={8}>
