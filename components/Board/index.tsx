@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Button from "../button";
-import Modal from "./components/modal";
+import ModalRenderer from "./components/Modal/modal";
 import { Tasks, useTasksStore } from "@/kanban/lib/store/useTasksStore";
 import { useShallow } from "zustand/shallow";
 import { useColumnStore, type Column } from "@/kanban/lib/store/useColumnStore";
@@ -130,6 +130,9 @@ const Board = () => {
         {/* Add New Column Button */}
         <AddColumn onAddColumn={addNewColumn} />
       </div>
+
+      {/* Modal Renderer - renders modals based on modal type */}
+      <ModalRenderer />
     </section>
   );
 };
@@ -171,17 +174,11 @@ const EmptyBoard = ({
 };
 
 const Card = ({ id: taskId, title, description, subtasks }: Tasks) => {
-  const { modal, openModal, closeModal } = useModalStore(
+  const { openModal } = useModalStore(
     useShallow((state) => ({
-      modal: state.modal,
       openModal: state.openModal,
-      closeModal: state.closeModal,
     }))
   );
-
-  const handleCloseModal = () => {
-    closeModal();
-  };
 
   const onOpenModal = () => {
     openModal(ModalType.EDIT_TASK, taskId);
@@ -208,12 +205,6 @@ const Card = ({ id: taskId, title, description, subtasks }: Tasks) => {
           </p>
         )}
       </div>
-
-      {modal.isModalOpen &&
-        modal.modalType === ModalType.EDIT_TASK &&
-        modal.data === taskId && (
-          <Modal isOpen={modal.isModalOpen} onClose={handleCloseModal} />
-        )}
     </>
   );
 };
