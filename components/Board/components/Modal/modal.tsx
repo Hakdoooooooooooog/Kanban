@@ -120,9 +120,11 @@ const EditTaskContent = ({
   // Sync selectedStatus with the current task's columnId
   useEffect(() => {
     if (task && task.columnId) {
-      setSelectedStatus(task.columnId || "TODO");
+      setSelectedStatus(
+        columns.find((col) => col.id === task.columnId)?.status || "TODO"
+      );
     }
-  }, [task]);
+  }, [task, columns]);
 
   // If task is not found, show loading state
   if (!task) {
@@ -150,7 +152,7 @@ const EditTaskContent = ({
           </h3>
           <Dropdown
             options={columns.map((column) => column.status)}
-            selected={task.columnId || selectedStatus}
+            selected={selectedStatus}
             onSelect={handleSelectChange}
           />
         </div>

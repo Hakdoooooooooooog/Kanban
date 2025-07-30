@@ -109,13 +109,6 @@ const EmptyBoard = ({ boardId }: { boardId: string }) => {
       status: columnName.toUpperCase().replace(/\s+/g, "_"),
       color: randomColor,
     });
-
-    console.log("New column added:", {
-      id: generateUUID(),
-      boardId: boardId,
-      status: columnName.toUpperCase().replace(/\s+/g, "_"),
-      color: randomColor,
-    });
   };
 
   return (

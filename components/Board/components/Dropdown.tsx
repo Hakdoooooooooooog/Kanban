@@ -12,7 +12,11 @@ const Dropdown = ({
 }) => {
   const getSelectedValue = useMemo(() => {
     const selectedOption = options.find((option) => option === selected);
-    return selectedOption ? selectedOption : options[0];
+    if (!selectedOption) {
+      return options[0];
+    }
+
+    return selectedOption;
   }, [options, selected]);
 
   return (
