@@ -6,15 +6,10 @@ import SidebarHeader from "./components/SidebarHeader";
 import BoardsList from "./components/BoardsList";
 import ThemeToggle from "../ThemeToggle";
 import SidebarFooter from "./components/SidebarFooter";
-import { Board, useBoardStore } from "@/kanban/lib/store/useBoardStore";
+import { useBoardStore } from "@/kanban/lib/store/useBoardStore";
 import { useShallow } from "zustand/shallow";
 import useSidebarStore from "@/kanban/lib/store/useSidebarStore";
-
-const boardItems: Board[] = [
-  { id: "1", name: "Board 1", isActive: true },
-  { id: "2", name: "Board 2" },
-  { id: "3", name: "Board 3" },
-];
+import { sidebarBoardItems } from "@/kanban/lib/const/sidebar";
 
 const Sidebar = () => {
   const { boards, setBoard, setActiveBoard, addBoard } = useBoardStore(
@@ -85,7 +80,7 @@ const Sidebar = () => {
   useEffect(() => {
     // Initialize boards if not already set
     if (!boards || boards.length === 0) {
-      setBoard(boardItems);
+      setBoard(sidebarBoardItems);
     }
   }, [boards, setBoard]);
 

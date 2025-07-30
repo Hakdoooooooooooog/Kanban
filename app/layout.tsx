@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
+import Header from "../components/Header";
+import MainContent from "../components/MainContent";
+import Sidebar from "../components/Sidebar";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -63,7 +66,13 @@ export default function RootLayout({
         />
       </head>
       <body className={`${plusJakartaSans.variable} font-Jakarta antialiased`}>
-        {children}
+        <div className="flex w-full min-h-screen relative overflow-hidden custom-scrollbar">
+          <Sidebar />
+          <MainContent>
+            <Header />
+            {children}
+          </MainContent>
+        </div>
       </body>
     </html>
   );

@@ -1,6 +1,10 @@
+"use client";
+
 import React, { useState, useEffect } from "react";
 import FluentBoardSplit24Regular from "../../SVGIcons/FluentBoardSplit24Regular";
 import { BoardStore } from "@/kanban/lib/store/useBoardStore";
+import { useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 // Skeleton component for loading state
 const BoardSkeleton = () => (
@@ -15,6 +19,8 @@ const BoardsList = ({
   addBoard,
   setActiveBoard,
 }: Pick<BoardStore, "boards" | "addBoard" | "setActiveBoard">) => {
+  const router = useRouter();
+  const path = usePathname();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -50,8 +56,13 @@ const BoardsList = ({
                     if (board.isActive) return;
 
                     setActiveBoard(board.id);
+                    router.push(`/Dashboard/${board.id}`);
                   }}
-                  className={`item ${board.isActive ? "active" : ""}`}
+                  className={`item ${
+                    board.isActive || path === `/Dashboard/${board.id}`
+                      ? "active"
+                      : ""
+                  }`}
                 >
                   <FluentBoardSplit24Regular props={{ className: "icon" }} />
                   <span className="text-sm">{board.name}</span>
