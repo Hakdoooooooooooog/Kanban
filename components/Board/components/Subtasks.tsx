@@ -1,28 +1,33 @@
-import { Subtask } from "@/kanban/lib/store/useTasksStore";
+import { useTasksStore } from "@/kanban/lib/store/useTasksStore";
 import { Toggle } from "@base-ui-components/react";
+import { useMemo } from "react";
+import { useShallow } from "zustand/shallow";
 
-const Subtasks = ({
-  taskId,
-  subtasks,
-  onSubtaskToggle,
-}: {
-  taskId: string;
-  subtasks: Subtask[] | undefined;
-  onSubtaskToggle: (taskId: string, subtaskId: string) => void;
-}) => {
-  if (!subtasks || subtasks.length === 0) {
-    return (
-      <p className="text-sm text-gray-500 dark:text-gray-400">
-        No subtasks available.
-      </p>
+const Subtasks = ({ taskId }: { taskId: string | undefined }) => {
+  const { setSubtaskCompletion } = useTasksStore(
+    useShallow((state) => ({
+      setSubtaskCompletion: state.setSubtaskCompletion,
+    }))
+  );
+
+  const subtasks = useTasksStore(
+    useShallow((state) => {
+      if (!taskId) return [];
+      return state.getSubtasksById(taskId);
+    })
+  );
+
+  const countSubtasksCompleted = useMemo(() => {
+    return subtasks.reduce(
+      (count, subtask) => count + (subtask.isCompleted ? 1 : 0),
+      0
     );
-  }
+  }, [subtasks]);
 
-  return subtasks && subtasks.length > 0 ? (
+  return taskId && subtasks.length > 0 ? (
     <div className="flex flex-col gap-4 mt-2">
       <h3 className="text-sm font-bold text-gray-500 dark:text-gray-300">
-        Subtasks ({subtasks.filter((subtask) => subtask.isCompleted).length} of{" "}
-        {subtasks.length || 0})
+        Subtasks ({countSubtasksCompleted} of {subtasks.length})
       </h3>
       {subtasks.map((subtask, index) => (
         <div
@@ -34,7 +39,7 @@ const Subtasks = ({
             pressed={subtask.isCompleted || false}
             onPressedChange={() => {
               if (subtask.id) {
-                onSubtaskToggle(taskId, subtask.id);
+                setSubtaskCompletion(taskId, subtask.id);
               }
             }}
             render={(props, state) => {

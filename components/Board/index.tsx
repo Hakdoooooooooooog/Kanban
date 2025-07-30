@@ -28,11 +28,13 @@ const SampleTasks: Tasks[] = [
     subtasks: [
       {
         id: "1.1",
+        taskId: "1",
         title: "Subtask 1.1",
         isCompleted: false,
       },
       {
         id: "1.2",
+        taskId: "1",
         title: "Subtask 1.2",
         isCompleted: true,
       },
@@ -54,11 +56,13 @@ const SampleTasks: Tasks[] = [
     subtasks: [
       {
         id: "3.1",
+        taskId: "3",
         title: "Subtask 3.1",
         isCompleted: false,
       },
       {
         id: "3.2",
+        taskId: "3",
         title: "Subtask 3.2",
         isCompleted: false,
       },
@@ -107,8 +111,6 @@ const Board = () => {
   if (tasks.length === 0) {
     return <EmptyBoard />;
   }
-
-  console.log("Tasks:", tasks);
 
   return (
     <section className="w-full h-[calc(100dvh-73px)] relative overflow-x-auto overflow-y-hidden bg-gray-200 dark:bg-gray-900 p-4">

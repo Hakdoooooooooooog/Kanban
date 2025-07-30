@@ -1,37 +1,38 @@
 import { Column, useColumnStore } from "@/kanban/lib/store/useColumnStore";
 import { Tasks } from "@/kanban/lib/store/useTasksStore";
 import BoardCard from "./board-card";
-import { useShallow } from "zustand/shallow";
 import { generateUUID } from "@/kanban/lib/utils";
+import { memo, useCallback } from "react";
 
-const BoardColumn = ({ column, tasks }: { column: Column; tasks: Tasks[] }) => {
-  return (
-    <div className="w-[280px] flex-shrink-0">
-      <h3 className="text-md font-semibold mb-2 text-black dark:text-white">
-        <span className="inline-flex items-center">
-          <svg className="w-3 h-3 inline-block mr-2" viewBox="0 0 12 12">
-            <circle cx="6" cy="6" r="5" fill={column.color} />
-          </svg>
-        </span>
-        {column.status} ({tasks.length})
-      </h3>
-      <div className="flex flex-col gap-2">
-        {tasks.map((task) => (
-          <BoardCard key={task.id} {...task} />
-        ))}
+const BoardColumn = memo(
+  ({ column, tasks }: { column: Column; tasks: Tasks[] }) => {
+    return (
+      <div className="w-[280px] flex-shrink-0">
+        <h3 className="text-md font-semibold mb-2 text-black dark:text-white">
+          <span className="inline-flex items-center">
+            <svg className="w-3 h-3 inline-block mr-2" viewBox="0 0 12 12">
+              <circle cx="6" cy="6" r="5" fill={column.color} />
+            </svg>
+          </span>
+          {column.status} ({tasks.length})
+        </h3>
+        <div className="flex flex-col gap-2">
+          {tasks.map((task) => (
+            <BoardCard key={task.id} {...task} />
+          ))}
+        </div>
       </div>
-    </div>
-  );
-};
+    );
+  }
+);
 
-export const AddColumn = () => {
-  const { addNewColumn } = useColumnStore(
-    useShallow((state) => ({
-      addNewColumn: state.addColumn,
-    }))
-  );
+// Add display name for debugging
+BoardColumn.displayName = "BoardColumn";
 
-  const handleClick = () => {
+export const AddColumn = memo(() => {
+  const addNewColumn = useColumnStore((state) => state.addColumn);
+
+  const handleClick = useCallback(() => {
     // For demo purposes, we'll add a default column
     const columnName = prompt("Enter column name:") || "New Column";
     const colors = [
@@ -49,7 +50,7 @@ export const AddColumn = () => {
       status: columnName.toUpperCase().replace(/\s+/g, "_"),
       color: randomColor,
     });
-  };
+  }, [addNewColumn]);
 
   return (
     <div
@@ -61,5 +62,9 @@ export const AddColumn = () => {
       </h4>
     </div>
   );
-};
+});
+
+// Add display name for debugging
+AddColumn.displayName = "AddColumn";
+
 export default BoardColumn;

@@ -12,6 +12,7 @@ export type Tasks = {
 
 export type Subtask = {
   id: string;
+  taskId: string;
   title: string;
   isCompleted?: boolean;
 };
@@ -25,7 +26,7 @@ type TasksStore = {
   updateTaskStatus: (taskId: string, status: string) => void;
   getTaskById: (taskId: string) => Tasks | undefined;
   getTasksByColumnId: (columnId: string) => Tasks[];
-  getSubtaskById: (taskId: string, subtaskId: string) => Subtask | undefined;
+  getSubtasksById: (taskId: string) => Subtask[];
   setSubtaskCompletion: (taskId: string, subtaskId: string) => void;
 };
 
@@ -56,10 +57,8 @@ export const useTasksStore = create<TasksStore>((set, get) => ({
     get().tasks.find((task) => task.id === taskId),
   getTasksByColumnId: (columnId: string) =>
     get().tasks.filter((task) => task.columnId === columnId),
-  getSubtaskById: (taskId: string, subtaskId: string) =>
-    get()
-      .tasks.find((task) => task.id === taskId)
-      ?.subtasks?.find((subtask) => subtask.id === subtaskId),
+  getSubtasksById: (taskId: string) =>
+    get().tasks.find((task) => task.id === taskId)?.subtasks || [],
   setSubtaskCompletion: (taskId: string, subtaskId: string) =>
     set((state) => ({
       tasks: state.tasks.map((task) =>
