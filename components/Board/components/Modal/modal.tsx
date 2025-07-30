@@ -13,7 +13,7 @@ import Dropdown from "../Dropdown";
 import Subtasks from "../Subtasks";
 
 // Main Modal Renderer - handles backdrop, ESC key, and renders modal content
-const ModalRenderer = memo(() => {
+const ModalRenderer = memo(({ boardId }: { boardId: string }) => {
   const { modal, closeModal } = useModalStore(
     useShallow((state) => ({
       modal: state.modal,
@@ -45,17 +45,23 @@ const ModalRenderer = memo(() => {
   const renderModalContent = useMemo(() => {
     switch (modal.modalType) {
       case ModalType.EDIT_TASK:
-        return <EditTaskContent modal={modal} columns={columns} />;
+        return (
+          <EditTaskContent modal={modal} columns={columns} boardId={boardId} />
+        );
       case ModalType.ADD_TASK:
-        return <EditTaskContent modal={modal} columns={columns} />;
+        return <PlaceholderContent modalType={ModalType.ADD_TASK} />;
       case ModalType.ADD_BOARD:
+        return <PlaceholderContent modalType={ModalType.ADD_BOARD} />;
       case ModalType.EDIT_BOARD:
+        return <PlaceholderContent modalType={ModalType.EDIT_BOARD} />;
       case ModalType.ADD_COLUMN:
+        return <PlaceholderContent modalType={ModalType.ADD_COLUMN} />;
       case ModalType.EDIT_COLUMN:
+        return <PlaceholderContent modalType={ModalType.EDIT_COLUMN} />;
       default:
         return <PlaceholderContent modalType={modal.modalType} />;
     }
-  }, [modal, columns]);
+  }, [modal, columns, boardId]);
 
   // Don't render anything if modal is not open
   if (!modal.isModalOpen || !modal.modalType) {
@@ -77,9 +83,11 @@ const ModalRenderer = memo(() => {
 const EditTaskContent = ({
   modal,
   columns,
+  boardId,
 }: {
   modal: ModalState;
   columns: Column[];
+  boardId: string;
 }) => {
   const [selectedStatus, setSelectedStatus] = useState("TODO");
   const { updateTaskStatus } = useTasksStore(
@@ -151,7 +159,9 @@ const EditTaskContent = ({
             Current Status
           </h3>
           <Dropdown
-            options={columns.map((column) => column.status)}
+            options={columns
+              .filter((col) => col.boardId === boardId)
+              .map((col) => col.status)}
             selected={selectedStatus}
             onSelect={handleSelectChange}
           />

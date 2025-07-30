@@ -78,7 +78,7 @@ const Board = ({ boardId }: { boardId: string }) => {
         <AddColumn boardId={boardId} />
       </div>
 
-      <ModalRenderer />
+      <ModalRenderer boardId={boardId} />
     </section>
   );
 };
