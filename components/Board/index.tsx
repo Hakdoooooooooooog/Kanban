@@ -10,8 +10,6 @@ import { generateUUID, replaceSpacesWithDashes } from "@/kanban/lib/utils";
 import BoardSkeleton from "./components/Skeleton";
 import BoardColumn, { AddColumn } from "./components/board-column";
 
-// Skeleton Components
-
 // Default columns, replace with actual data fetching in production, the id is uuid
 const defaultColumns: Column[] = [
   { id: "1", status: "TODO", color: "#49C4E5" },

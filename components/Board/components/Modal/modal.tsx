@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useCallback, useState } from "react";
+import React, { useEffect, useMemo, useCallback, useState, memo } from "react";
 import DottedMenu from "../../../SVGIcons/DottedMenu";
 import "./modal.css";
 import { useTasksStore } from "@/kanban/lib/store/useTasksStore";
@@ -13,7 +13,7 @@ import Dropdown from "../Dropdown";
 import Subtasks from "../Subtasks";
 
 // Main Modal Renderer - handles backdrop, ESC key, and renders modal content
-const ModalRenderer = () => {
+const ModalRenderer = memo(() => {
   const { modal, closeModal } = useModalStore(
     useShallow((state) => ({
       modal: state.modal,
@@ -72,7 +72,7 @@ const ModalRenderer = () => {
       </div>
     </div>
   );
-};
+});
 
 const EditTaskContent = ({
   modal,
@@ -102,7 +102,8 @@ const EditTaskContent = ({
     columnId: "",
     subtasks: [],
   };
-  const dropdownOptions = useCallback(() => {
+
+  const dropdownOptions = useMemo(() => {
     return columns.map((column) => ({
       label: column.status,
       value: column.id,
@@ -152,7 +153,7 @@ const EditTaskContent = ({
             Current Status
           </h3>
           <Dropdown
-            options={dropdownOptions()}
+            options={dropdownOptions}
             selected={task.columnId || selectedStatus}
             onSelect={handleSelectChange}
           />
@@ -173,5 +174,7 @@ const PlaceholderContent = ({ modalType }: { modalType: string | null }) => (
     </p>
   </div>
 );
+
+ModalRenderer.displayName = "ModalRenderer";
 
 export default ModalRenderer;
