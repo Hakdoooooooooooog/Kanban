@@ -2,6 +2,7 @@ import { create } from "zustand";
 
 export type Column = {
   id: string;
+  boardId: string; // Optional, used for tasks
   status: TaskStatus | string;
   color: string;
 };
