@@ -5,6 +5,7 @@ import FluentBoardSplit24Regular from "../../SVGIcons/FluentBoardSplit24Regular"
 import { BoardStore } from "@/kanban/lib/store/useBoardStore";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
+import { generateUUID } from "@/kanban/lib/utils";
 
 // Skeleton component for loading state
 const BoardSkeleton = () => (
@@ -77,8 +78,8 @@ const BoardsList = ({
                   onClick={() => {
                     // This is the default values for now, should replace with true value via modal
                     addBoard({
-                      id: Date.now().toString(),
-                      name: "New Board",
+                      id: generateUUID(),
+                      name: `Board ${boards.length + 1}`,
                       isActive: false,
                     });
                   }}
