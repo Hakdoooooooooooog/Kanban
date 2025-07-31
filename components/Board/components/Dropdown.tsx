@@ -1,59 +1,54 @@
-import { Menu } from "@base-ui-components/react";
+import { Select } from "@base-ui-components/react";
 import { useMemo } from "react";
 
 const Dropdown = ({
   options,
-  selected,
   onSelect,
+  selected,
 }: {
   options: string[];
-  selected: string;
   onSelect: (value: string) => void;
+  selected: string;
 }) => {
-  const getSelectedValue = useMemo(() => {
-    const selectedOption = options.find((option) => option === selected);
-    if (!selectedOption) {
-      return options[0];
-    }
-
-    return selectedOption;
-  }, [options, selected]);
+  const selectItems = useMemo(() => {
+    return options.map((option) => ({
+      value: option,
+      label: option.charAt(0).toUpperCase() + option.slice(1),
+    }));
+  }, [options]);
 
   return (
-    <Menu.Root>
-      <Menu.Trigger className="menu-btn">
-        {getSelectedValue} <ChevronDownIcon className="inline-block ml-2" />
-      </Menu.Trigger>
-      <Menu.Portal>
-        <Menu.Positioner className={"outline-0"} sideOffset={8}>
-          <Menu.Popup className={"popup"}>
-            <Menu.Arrow className={"arrow"}>
-              <ArrowSvg />
-            </Menu.Arrow>
-            {options.map((option, index) => (
-              <Menu.Item
+    <Select.Root items={selectItems}>
+      <Select.Trigger className="Select">
+        <Select.Value render={<span>{selected}</span>} />
+        <Select.Icon className="SelectIcon">
+          <ChevronDownIcon />
+        </Select.Icon>
+      </Select.Trigger>
+      <Select.Portal>
+        <Select.Positioner className="Positioner" sideOffset={8}>
+          <Select.ScrollUpArrow className="ScrollArrow" />
+          <Select.Popup className="Popup">
+            {selectItems.map((item, index) => (
+              <Select.Item
                 key={index}
-                className="menu-item"
-                onClick={() => onSelect(option)}
+                value={item.value}
+                className="Item"
+                onClick={() => onSelect(item.value)}
               >
-                {option}
-              </Menu.Item>
+                <Select.ItemIndicator className="ItemIndicator">
+                  <CheckIcon className="ItemIndicatorIcon" />
+                </Select.ItemIndicator>
+                <Select.ItemText className="ItemText">
+                  {item.label}
+                </Select.ItemText>
+              </Select.Item>
             ))}
-          </Menu.Popup>
-        </Menu.Positioner>
-      </Menu.Portal>
-    </Menu.Root>
-  );
-};
-
-const ArrowSvg = (props: React.ComponentProps<"svg">) => {
-  return (
-    <svg width="20" height="10" viewBox="0 0 20 10" fill="none" {...props}>
-      <path
-        d="M9.66437 2.60207L4.80758 6.97318C4.07308 7.63423 3.11989 8 2.13172 8H0V10H20V8H18.5349C17.5468 8 16.5936 7.63423 15.8591 6.97318L11.0023 2.60207C10.622 2.2598 10.0447 2.25979 9.66437 2.60207Z"
-        className="arrowFill"
-      />
-    </svg>
+          </Select.Popup>
+          <Select.ScrollDownArrow className="ScrollArrow" />
+        </Select.Positioner>
+      </Select.Portal>
+    </Select.Root>
   );
 };
 
@@ -64,5 +59,19 @@ const ChevronDownIcon = (props: React.ComponentProps<"svg">) => {
     </svg>
   );
 };
+
+function CheckIcon(props: React.ComponentProps<"svg">) {
+  return (
+    <svg
+      fill="currentcolor"
+      width="10"
+      height="10"
+      viewBox="0 0 10 10"
+      {...props}
+    >
+      <path d="M9.1603 1.12218C9.50684 1.34873 9.60427 1.81354 9.37792 2.16038L5.13603 8.66012C5.01614 8.8438 4.82192 8.96576 4.60451 8.99384C4.3871 9.02194 4.1683 8.95335 4.00574 8.80615L1.24664 6.30769C0.939709 6.02975 0.916013 5.55541 1.19372 5.24822C1.47142 4.94102 1.94536 4.91731 2.2523 5.19524L4.36085 7.10461L8.12299 1.33999C8.34934 0.993152 8.81376 0.895638 9.1603 1.12218Z" />
+    </svg>
+  );
+}
 
 export default Dropdown;
