@@ -1,3 +1,5 @@
+import ModalRenderer from "@/kanban/components/Modal/modal";
+
 export default function Dashboard() {
   return (
     <div className="min-h-[calc(100vh-73px)] flex items-center justify-center flex-col gap-4 bg-gray-100 dark:bg-gray-800">
@@ -14,6 +16,8 @@ export default function Dashboard() {
         </span>{" "}
         button to add a new board.
       </p>
+
+      <ModalRenderer />
     </div>
   );
 }

@@ -22,7 +22,9 @@ const BoardColumn = memo(
               No tasks available in this column.
             </p>
           ) : (
-            tasks.map((task) => <BoardCard key={task.id} {...task} />)
+            tasks.map((task) => (
+              <BoardCard key={task.id} {...task} boardId={column.boardId} />
+            ))
           )}
         </div>
       </div>

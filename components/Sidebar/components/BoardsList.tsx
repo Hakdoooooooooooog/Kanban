@@ -6,6 +6,8 @@ import { BoardStore } from "@/kanban/lib/store/useBoardStore";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { generateUUID } from "@/kanban/lib/utils";
+import { useShallow } from "zustand/shallow";
+import { ModalType, useModalStore } from "@/kanban/lib/store/useModalStore";
 
 // Skeleton component for loading state
 const BoardSkeleton = () => (
@@ -23,6 +25,13 @@ const BoardsList = ({
   const router = useRouter();
   const path = usePathname();
   const [isLoading, setIsLoading] = useState(true);
+
+  const { modal, openModal } = useModalStore(
+    useShallow((state) => ({
+      modal: state.modal,
+      openModal: state.openModal,
+    }))
+  );
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -76,11 +85,9 @@ const BoardsList = ({
                 <span
                   className="text-sm cursor-pointer"
                   onClick={() => {
-                    // This is the default values for now, should replace with true value via modal
-                    addBoard({
-                      id: generateUUID(),
-                      name: `Board ${boards.length + 1}`,
-                      isActive: false,
+                    openModal(ModalType.ADD_BOARD, {
+                      boardId: generateUUID(),
+                      boardName: `Board ${boards.length + 1}`,
                     });
                   }}
                 >

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Button from "../button";
-import ModalRenderer from "./components/Modal/modal";
+import ModalRenderer from "../Modal/modal";
 import { useTasksStore } from "@/kanban/lib/store/useTasksStore";
 import { useShallow } from "zustand/shallow";
 import { useColumnStore } from "@/kanban/lib/store/useColumnStore";
@@ -96,7 +96,7 @@ const Board = ({ boardId }: { boardId: string }) => {
         <AddColumn boardId={boardId} />
       </div>
 
-      <ModalRenderer boardId={boardId} />
+      <ModalRenderer />
     </section>
   );
 };

@@ -2,7 +2,13 @@ import { useModalStore, ModalType } from "@/kanban/lib/store/useModalStore";
 import { Tasks } from "@/kanban/lib/store/useTasksStore";
 import { useShallow } from "zustand/shallow";
 
-const BoardCard = ({ id: taskId, title, description, subtasks }: Tasks) => {
+const BoardCard = ({
+  id: taskId,
+  title,
+  description,
+  subtasks,
+  boardId,
+}: Tasks & { boardId: string }) => {
   const { openModal } = useModalStore(
     useShallow((state) => ({
       openModal: state.openModal,
@@ -10,7 +16,10 @@ const BoardCard = ({ id: taskId, title, description, subtasks }: Tasks) => {
   );
 
   const onOpenModal = () => {
-    openModal(ModalType.EDIT_TASK, taskId);
+    openModal(ModalType.EDIT_TASK, {
+      taskId,
+      boardId,
+    });
   };
 
   const handleSubtaskCompletion = () => {
