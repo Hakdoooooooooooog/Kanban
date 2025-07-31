@@ -6,5 +6,6 @@ export default async function BoardPage({
   params: Promise<{ boarduuid: string }>;
 }) {
   const { boarduuid } = await params;
+
   return <Board boardId={boarduuid} />;
 }

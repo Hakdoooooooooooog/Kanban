@@ -10,20 +10,25 @@ import { generateUUID, replaceSpacesWithDashes } from "@/kanban/lib/utils";
 import BoardSkeleton from "./components/Skeleton";
 import BoardColumn, { AddColumn } from "./components/board-column";
 import { defaultColumns, sampleTasks } from "@/kanban/lib/const/board";
+import { useBoardStore } from "@/kanban/lib/store/useBoardStore";
 
 const Board = ({ boardId }: { boardId: string }) => {
   const [isLoading, setIsLoading] = useState(true);
 
   const tasks = useTasksStore(
     useShallow((state) => {
-      if (!state.tasks) return [];
       return state.getTasksByBoardId(boardId);
+    })
+  );
+
+  const boards = useBoardStore(
+    useShallow((state) => {
+      return state.getBoards();
     })
   );
 
   const columns = useColumnStore(
     useShallow((state) => {
-      if (!state.columns) return [];
       return state.getColumnById(boardId) || [];
     })
   );
@@ -41,7 +46,7 @@ const Board = ({ boardId }: { boardId: string }) => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Initialize columns and tasks if they are empty
+  // Initialize columns and tasks if they are empty, this can be replaced with actual data fetching logic
   useEffect(() => {
     if (columns.length === 0) {
       setColumns(defaultColumns);
@@ -54,6 +59,19 @@ const Board = ({ boardId }: { boardId: string }) => {
   // Show skeleton while loading
   if (isLoading) {
     return <BoardSkeleton />;
+  }
+
+  if (!boards.some((board) => board.id === boardId)) {
+    return (
+      <section className="w-full h-[calc(100dvh-73px)] flex flex-col items-center justify-center bg-gray-200 dark:bg-gray-900">
+        <h2 className="text-lg font-bold p-4 text-black dark:text-white">
+          Board not found. Please check the board ID.
+        </h2>
+        <Button onClick={() => (window.location.href = "/Dashboard")}>
+          Go to Dashboard
+        </Button>
+      </section>
+    );
   }
 
   if (columns.length === 0 && tasks.length === 0) {

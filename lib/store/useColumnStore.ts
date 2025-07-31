@@ -24,7 +24,16 @@ export type ColumnStore = {
 
 export const useColumnStore = create<ColumnStore>((set, get) => ({
   columns: [],
-  setColumns: (columns: Column[]) => set({ columns }),
+  setColumns: (columns: Column[]) =>
+    set((state) => {
+      const allColumns = [...state.columns, ...columns];
+      // Ensure no duplicates
+      const uniqueColumns = allColumns.filter(
+        (column, index, self) =>
+          index === self.findIndex((c) => c.id === column.id)
+      );
+      return { columns: uniqueColumns };
+    }),
   addColumn: (column: Column) =>
     set((state) => ({
       columns: [...state.columns, column],

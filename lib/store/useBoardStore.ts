@@ -8,6 +8,7 @@ export interface Board {
 
 export type BoardStore = {
   boards: Board[];
+  getBoards: () => Board[];
   setBoards: (boards: Board[]) => void;
   setActiveBoard: (boardId: string) => void;
   getActiveBoardSlug: () => string | undefined;
@@ -17,7 +18,17 @@ export type BoardStore = {
 
 export const useBoardStore = create<BoardStore>()((set, get) => ({
   boards: [] as Board[],
-  setBoards: (boards: Board[]) => set({ boards }),
+  getBoards: () => get().boards,
+  setBoards: (boards: Board[]) =>
+    set((state) => {
+      const allBoards = [...state.boards, ...boards];
+      // Ensure no duplicates
+      const uniqueBoards = allBoards.filter(
+        (board, index, self) =>
+          index === self.findIndex((b) => b.id === board.id)
+      );
+      return { boards: uniqueBoards };
+    }),
   setActiveBoard: (boardId: string) =>
     set((state) => ({
       boards: state.boards.map((board) => {
