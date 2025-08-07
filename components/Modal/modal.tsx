@@ -7,6 +7,7 @@ import { useShallow } from "zustand/shallow";
 import EditTaskContent from "./ModalTypes/EditTaskContent";
 
 import "./modal.css";
+import AddNewTask from "./ModalTypes/AddNewTask";
 
 // Main Modal Renderer - handles backdrop, ESC key, and renders modal content
 const ModalRenderer = memo(() => {
@@ -16,6 +17,7 @@ const ModalRenderer = memo(() => {
       closeModal: state.closeModal,
     }))
   );
+
   const columns = useColumnStore(useShallow((state) => state.columns));
 
   const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -43,7 +45,7 @@ const ModalRenderer = memo(() => {
       case ModalType.EDIT_TASK:
         return <EditTaskContent modal={modal} columns={columns} />;
       case ModalType.ADD_TASK:
-        return <PlaceholderContent modalType={ModalType.ADD_TASK} />;
+        return <AddNewTask modal={modal} />;
       case ModalType.ADD_BOARD:
         return <PlaceholderContent modalType={ModalType.ADD_BOARD} />;
       case ModalType.EDIT_BOARD:

@@ -1,23 +1,26 @@
 "use client";
-
 import React from "react";
 
 interface ButtonProps {
   size?: "sm" | "md" | "lg";
-  variant?: "primary" | "secondary" | "destructive" | "ghost" | "disabled";
-  className?: string;
-  children: React.ReactNode;
-  onClick?: () => void;
+  variant?:
+    | "primary"
+    | "secondary"
+    | "tertiary"
+    | "destructive"
+    | "ghost"
+    | "disabled";
   disabled?: boolean;
+  children: React.ReactNode;
+  props: React.ComponentProps<"button">;
 }
 
 const Button = ({
   size = "md",
   variant = "primary",
-  className = "",
-  children,
-  onClick,
   disabled = false,
+  children,
+  props,
 }: ButtonProps) => {
   const baseStyles =
     "inline-flex items-center justify-center font-medium rounded-full transition-all duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50";
@@ -33,6 +36,8 @@ const Button = ({
       "bg-primary text-white hover:bg-primary/90 focus:ring-primary/50 shadow-sm",
     secondary:
       "bg-secondary text-white hover:bg-secondary/90 focus:ring-secondary/50 shadow-sm",
+    tertiary:
+      "bg-white text-black hover:bg-gray-100 dark:hover:bg-gray-800 dark:text-black focus:ring-tertiary/50 shadow-sm",
     destructive:
       "bg-red-500 text-white hover:bg-red-600 focus:ring-red-500/50 shadow-sm",
     ghost:
@@ -41,14 +46,21 @@ const Button = ({
       "bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed",
   };
 
+  // Extract className from props and remove it from the rest of props
+  const { className: propsClassName, ...restProps } = props;
+
+  // Merge default styles with props className
+  const mergedClassName = [
+    baseStyles,
+    sizeStyles[size],
+    disabled ? variantStyles.disabled : variantStyles[variant],
+    propsClassName, // Add custom className from props
+  ]
+    .filter(Boolean) // Remove any undefined/null values
+    .join(" "); // Join all classes with space
+
   return (
-    <button
-      className={`${baseStyles} ${sizeStyles[size]} ${
-        disabled ? variantStyles.disabled : variantStyles[variant]
-      } ${className}`}
-      onClick={onClick}
-      disabled={disabled}
-    >
+    <button className={mergedClassName} {...restProps} disabled={disabled}>
       {children}
     </button>
   );
