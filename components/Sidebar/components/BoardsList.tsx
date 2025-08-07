@@ -34,6 +34,8 @@ const BoardsList = ({ boards }: Pick<BoardStore, "boards">) => {
     }))
   );
 
+  // Simulate loading state for demonstration purposes
+  // In a real application, this would be replaced with actual data fetching logic
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
