@@ -21,10 +21,12 @@ const Board = ({ boardId }: { boardId: string }) => {
     })
   );
 
-  const boards = useBoardStore(
-    useShallow((state) => {
-      return state.getBoards();
-    })
+  const { boards, setActiveBoard, setLoading } = useBoardStore(
+    useShallow((state) => ({
+      boards: state.getBoards(),
+      setActiveBoard: state.setActiveBoard,
+      setLoading: state.setLoading,
+    }))
   );
 
   const columns = useColumnStore(
@@ -39,12 +41,20 @@ const Board = ({ boardId }: { boardId: string }) => {
 
   // Loading state, can be replaced with actual loading logic when fetching data
   useEffect(() => {
+    // Set loading to true when starting to load a new board
+    setLoading(true);
+
     const timer = setTimeout(() => {
       setIsLoading(false);
+      setActiveBoard(boardId);
+      setLoading(false); // Set loading to false when board is ready
     }, 500); // Adjust delay as needed
 
-    return () => clearTimeout(timer);
-  }, []);
+    return () => {
+      clearTimeout(timer);
+      setLoading(false); // Cleanup: ensure loading is false if component unmounts
+    };
+  }, [boardId, setActiveBoard, setLoading]);
 
   // Initialize columns and tasks if they are empty, this can be replaced with actual data fetching logic
   useEffect(() => {

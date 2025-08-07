@@ -2,11 +2,25 @@ import React, { useState, useEffect } from "react";
 import { Switch } from "@base-ui-components/react";
 import LightIcon from "./SVGIcons/LightIcon";
 import DarkIcon from "./SVGIcons/DarkIcon";
-import { useTheme } from "../contexts/ThemeContext";
+import { useShallow } from "zustand/shallow";
+import useThemeStore from "../lib/store/useThemeStore";
 
 const ThemeToggle = () => {
-  const { theme, toggleTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
+  const { theme, toggleTheme } = useThemeStore(
+    useShallow((state) => ({
+      theme: state.theme,
+      toggleTheme: state.toggleTheme,
+    }))
+  );
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && mounted) {
+      const html = document.documentElement;
+      html.classList.remove("light", "dark");
+      html.classList.add(theme);
+    }
+  }, [theme, mounted]);
 
   // Prevent hydration mismatch by only rendering after mount
   useEffect(() => {

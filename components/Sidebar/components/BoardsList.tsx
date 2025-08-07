@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import FluentBoardSplit24Regular from "../../SVGIcons/FluentBoardSplit24Regular";
-import { BoardStore } from "@/kanban/lib/store/useBoardStore";
+import { BoardStore, useBoardStore } from "@/kanban/lib/store/useBoardStore";
 import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { generateUUID } from "@/kanban/lib/utils";
@@ -17,10 +17,7 @@ const BoardSkeleton = () => (
   </li>
 );
 
-const BoardsList = ({
-  boards,
-  setActiveBoard,
-}: Pick<BoardStore, "boards" | "setActiveBoard">) => {
+const BoardsList = ({ boards }: Pick<BoardStore, "boards">) => {
   const router = useRouter();
   const path = usePathname();
   const [isLoading, setIsLoading] = useState(true);
@@ -28,6 +25,12 @@ const BoardsList = ({
   const { openModal } = useModalStore(
     useShallow((state) => ({
       openModal: state.openModal,
+    }))
+  );
+
+  const { isBoardLoading } = useBoardStore(
+    useShallow((state) => ({
+      isBoardLoading: state.isLoading,
     }))
   );
 
@@ -61,19 +64,33 @@ const BoardsList = ({
                 <li
                   key={board.id}
                   onClick={() => {
-                    if (board.isActive) return;
-
-                    setActiveBoard(board.id);
+                    // Prevent navigation if board is currently loading or if this board is already active
+                    if (
+                      isBoardLoading ||
+                      board.isActive ||
+                      path === `/Dashboard/${board.id}`
+                    ) {
+                      return;
+                    }
                     router.push(`/Dashboard/${board.id}`);
                   }}
                   className={`item ${
                     board.isActive || path === `/Dashboard/${board.id}`
                       ? "active"
                       : ""
+                  } ${
+                    isBoardLoading
+                      ? "pointer-events-none opacity-50"
+                      : "cursor-pointer"
                   }`}
                 >
                   <FluentBoardSplit24Regular props={{ className: "icon" }} />
                   <span className="text-sm">{board.name}</span>
+                  {isBoardLoading && path === `/Dashboard/${board.id}` && (
+                    <div className="ml-auto">
+                      <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                    </div>
+                  )}
                 </li>
               ))}
               <li className="w-full flex items-center gap-2 p-4 text-primary pl-10">

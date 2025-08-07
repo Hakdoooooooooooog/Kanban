@@ -8,16 +8,19 @@ export interface Board {
 
 export type BoardStore = {
   boards: Board[];
+  isLoading: boolean;
   getBoards: () => Board[];
   setBoards: (boards: Board[]) => void;
   setActiveBoard: (boardId: string) => void;
   getActiveBoardId: () => string | undefined;
   addBoard: (board: Board) => void;
   removeBoard: (board: Board) => void;
+  setLoading: (loading: boolean) => void;
 };
 
 export const useBoardStore = create<BoardStore>()((set, get) => ({
   boards: [] as Board[],
+  isLoading: false,
   getBoards: () => get().boards,
   setBoards: (boards: Board[]) =>
     set((state) => {
@@ -50,4 +53,5 @@ export const useBoardStore = create<BoardStore>()((set, get) => ({
     set((state) => ({
       boards: state.boards.filter((b) => b.id !== board.id),
     })),
+  setLoading: (loading: boolean) => set({ isLoading: loading }),
 }));

@@ -12,11 +12,10 @@ import useSidebarStore from "@/kanban/lib/store/useSidebarStore";
 import { sidebarBoardItems } from "@/kanban/lib/const/sidebar";
 
 const Sidebar = () => {
-  const { boards, setBoard, setActiveBoard } = useBoardStore(
+  const { boards, setBoard } = useBoardStore(
     useShallow((state) => ({
       boards: state.boards,
       setBoard: state.setBoards,
-      setActiveBoard: state.setActiveBoard,
       addBoard: state.addBoard,
     }))
   );
@@ -94,7 +93,7 @@ const Sidebar = () => {
       >
         <SidebarHeader />
 
-        <BoardsList boards={boards} setActiveBoard={setActiveBoard} />
+        <BoardsList boards={boards} />
 
         <div className="w-3/4 flex flex-col gap-4 justify-between pb-16 mx-auto">
           <ThemeToggle />
