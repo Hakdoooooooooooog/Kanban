@@ -6,7 +6,7 @@ export type Tasks = {
   boardId: string;
   columnId: Column["id"];
   title: string;
-  description?: string;
+  description: string;
   subtasks?: Subtask[];
 };
 

@@ -11,7 +11,7 @@ export type BoardStore = {
   getBoards: () => Board[];
   setBoards: (boards: Board[]) => void;
   setActiveBoard: (boardId: string) => void;
-  getActiveBoardSlug: () => string | undefined;
+  getActiveBoardId: () => string | undefined;
   addBoard: (board: Board) => void;
   removeBoard: (board: Board) => void;
 };
@@ -38,12 +38,9 @@ export const useBoardStore = create<BoardStore>()((set, get) => ({
         };
       }),
     })),
-  getActiveBoardSlug: (): string | undefined => {
+  getActiveBoardId: (): string | undefined => {
     const state = get();
-    return state.boards
-      .find((board) => board.isActive)
-      ?.name.replace(/\s+/g, "-")
-      .toLowerCase();
+    return state.boards.find((board) => board.isActive)?.id;
   },
   addBoard: (board: Board) =>
     set((state) => ({

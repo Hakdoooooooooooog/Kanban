@@ -20,6 +20,7 @@ export type ColumnStore = {
   removeColumn: (columnId: string) => void;
   updateColumn: (columnId: string, updatedColumn: Partial<Column>) => void;
   getColumnById: (boardId: string) => Column[] | undefined;
+  getAllColumnStatusByBoardId: (boardId: string) => string[];
 };
 
 export const useColumnStore = create<ColumnStore>((set, get) => ({
@@ -40,6 +41,10 @@ export const useColumnStore = create<ColumnStore>((set, get) => ({
     })),
   getColumnById: (boardId: string) =>
     get().columns.filter((column) => column.boardId === boardId),
+  getAllColumnStatusByBoardId: (boardId: string) =>
+    get()
+      .columns.filter((column) => column.boardId === boardId)
+      .map((column) => column.status),
   removeColumn: (columnId: string) =>
     set((state) => ({
       columns: state.columns.filter((column) => column.id !== columnId),

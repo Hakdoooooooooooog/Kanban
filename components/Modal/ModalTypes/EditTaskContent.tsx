@@ -11,7 +11,7 @@ const EditTaskContent = ({
   modal,
   columns,
 }: {
-  modal: ModalState;
+  modal: ModalState["data"];
   columns: Column[];
 }) => {
   const [selectedStatus, setSelectedStatus] = useState("TODO");
@@ -21,14 +21,16 @@ const EditTaskContent = ({
     }))
   );
 
+  const modalData = modal as { data?: { taskId?: string; boardId?: string } };
+
   const currentTaskId =
-    modal.data && typeof modal.data === "object"
-      ? (modal.data as { taskId: string }).taskId
+    modalData.data && typeof modalData.data === "object"
+      ? modalData.data.taskId
       : undefined;
 
   const currentBoardId =
-    modal.data && typeof modal.data === "object"
-      ? (modal.data as { boardId: string }).boardId
+    modalData.data && typeof modalData.data === "object"
+      ? modalData.data.boardId
       : undefined;
 
   const task = useTasksStore(

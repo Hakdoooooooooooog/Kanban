@@ -19,16 +19,14 @@ const BoardSkeleton = () => (
 
 const BoardsList = ({
   boards,
-  addBoard,
   setActiveBoard,
-}: Pick<BoardStore, "boards" | "addBoard" | "setActiveBoard">) => {
+}: Pick<BoardStore, "boards" | "setActiveBoard">) => {
   const router = useRouter();
   const path = usePathname();
   const [isLoading, setIsLoading] = useState(true);
 
-  const { modal, openModal } = useModalStore(
+  const { openModal } = useModalStore(
     useShallow((state) => ({
-      modal: state.modal,
       openModal: state.openModal,
     }))
   );

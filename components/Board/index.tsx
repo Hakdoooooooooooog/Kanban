@@ -67,7 +67,11 @@ const Board = ({ boardId }: { boardId: string }) => {
         <h2 className="text-lg font-bold p-4 text-black dark:text-white">
           Board not found. Please check the board ID.
         </h2>
-        <Button onClick={() => (window.location.href = "/Dashboard")}>
+        <Button
+          props={{
+            onClick: () => (window.location.href = "/Dashboard"),
+          }}
+        >
           Go to Dashboard
         </Button>
       </section>
@@ -134,7 +138,13 @@ const EmptyBoard = ({ boardId }: { boardId: string }) => {
       <h2 className="text-lg font-bold p-4">
         This board is empty. Create a new column to get started.
       </h2>
-      <Button onClick={handleAddColumn}>+ Add New Column</Button>
+      <Button
+        props={{
+          onClick: handleAddColumn,
+        }}
+      >
+        + Add New Column
+      </Button>
     </div>
   );
 };
