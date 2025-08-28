@@ -1,7 +1,7 @@
 import { Select } from "@base-ui-components/react";
 import { useMemo } from "react";
 
-const Dropdown = ({
+const SelectDropdown = ({
   options,
   onSelect,
   selected,
@@ -74,4 +74,4 @@ function CheckIcon(props: React.ComponentProps<"svg">) {
   );
 }
 
-export default Dropdown;
+export default SelectDropdown;
