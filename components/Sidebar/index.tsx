@@ -89,7 +89,7 @@ const Sidebar = () => {
       {/* Main Sidebar */}
       <nav
         ref={sidebarRef}
-        className="absolute left-0 top-0 w-[300px] h-full bg-gray-100 dark:bg-gray-800 flex flex-col gap-4 border-r border-r-gray-200 dark:border-r-gray-50 z-10"
+        className="absolute left-0 top-0 w-[300px] h-full bg-gray-100 dark:bg-gray-800 flex flex-col gap-4 border-r border-r-gray-200 dark:border-r-gray-50"
         style={{ transform: "translateX(0px)" }}
       >
         <SidebarHeader />

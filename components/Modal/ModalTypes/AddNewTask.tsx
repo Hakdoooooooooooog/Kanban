@@ -1,5 +1,9 @@
-import { useState } from "react";
-import { ModalState, ModalType } from "@/kanban/lib/store/useModalStore";
+import { useState, useEffect } from "react";
+import {
+  ModalState,
+  ModalType,
+  useModalStore,
+} from "@/kanban/lib/store/useModalStore";
 import {
   Subtask,
   Tasks,
@@ -23,21 +27,39 @@ const AddNewTask = ({ modal }: { modal: ModalState["data"] }) => {
     }))
   );
 
+  const { closeModal } = useModalStore(
+    useShallow((state) => ({
+      closeModal: state.closeModal,
+    }))
+  );
+
   const boardId =
     (modal as { data?: { boardId?: string } })?.data?.boardId || "";
 
-  const { getAllColumnStatusByBoardId } = useColumnStore(
+  const { getAllColumnStatusByBoardId, getColumnById } = useColumnStore(
     useShallow((state) => ({
       getAllColumnStatusByBoardId: state.getAllColumnStatusByBoardId,
+      getColumnById: state.getColumnById,
     }))
   );
 
   const statusOptions = getAllColumnStatusByBoardId(boardId);
+  const columns = getColumnById(boardId) || [];
+
+  // Reset form state when modal opens
+  useEffect(() => {
+    setStatus(undefined);
+    setSubtasks([]);
+  }, [modal]);
+
+  // Handle cancel - close modal and reset form
+  const handleCancel = () => {
+    setStatus(undefined);
+    setSubtasks([]);
+    closeModal();
+  };
 
   const handleAddSubtask = () => {
-    // Logic to add a subtask
-    console.log("Add subtask clicked");
-
     setSubtasks([...subtasks, { id: generateUUID(), taskId: "", title: "" }]);
   };
 
@@ -56,21 +78,54 @@ const AddNewTask = ({ modal }: { modal: ModalState["data"] }) => {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
 
-    console.log("Form Data:", Object.fromEntries(formData.entries()));
-    // Logic to add a new task
+    // Convert FormData to object
+    const formDataObject = Object.fromEntries(formData.entries());
 
-    // addTask({
-    //   ...(Object.fromEntries(formData.entries()) as unknown as Tasks),
-    //   id: generateUUID(),
-    //   boardId: newTaskModalData.data?.boardId || "",
-    //   columnId: "TODO", // Default to TODO or based on your logic
-    //   subtasks: subtasks,
-    // });
+    // Validate required fields
+    if (!formDataObject.title || !status) {
+      console.error("Missing required fields");
+      return;
+    }
+
+    // Find the column ID that matches the selected status
+    const selectedColumn = columns.find((col) => col.status === status);
+    if (!selectedColumn) {
+      console.error("No column found for selected status:", status);
+      return;
+    }
+
+    const taskId = generateUUID();
+
+    const newTask: Tasks = {
+      id: taskId,
+      title: formDataObject.title as string,
+      description: (formDataObject.description as string) || "",
+      boardId: boardId,
+      columnId: selectedColumn.id,
+      subtasks: subtasks
+        .filter((subtask) => subtask.title.trim() !== "")
+        .map((subtask) => ({ ...subtask, taskId })),
+    };
+
+    try {
+      addTask(newTask);
+
+      // Reset form state
+      setStatus(undefined);
+      setSubtasks([]);
+
+      // Close modal after successful task creation
+      closeModal();
+    } catch (error) {
+      console.error("Error adding task:", error);
+      // Don't close modal if there's an error
+    }
   };
+
   return (
     <>
       <div className="flex items-center justify-between">
-        <Form onSubmit={handleAddTask} className="Form">
+        <Form onSubmit={(e) => handleAddTask(e)} className="Form">
           <Fieldset.Root name="add-new-task" className="Field">
             <Fieldset.Legend className="Legend">Add New Task</Fieldset.Legend>
 
@@ -78,6 +133,7 @@ const AddNewTask = ({ modal }: { modal: ModalState["data"] }) => {
             <Field.Root className="Field">
               <Field.Label className="Label">Task Title</Field.Label>
               <Field.Control
+                name="title"
                 required
                 placeholder="e.g. Design a new logo"
                 className="Input"
@@ -91,7 +147,11 @@ const AddNewTask = ({ modal }: { modal: ModalState["data"] }) => {
             {/* Description */}
             <Field.Root className="Field">
               <Field.Label className="Label">Description</Field.Label>
-              <textarea className="w-full h-24 p-2 border rounded-md" />
+              <textarea
+                name="description"
+                className="w-full h-24 p-2 border rounded-md"
+                placeholder="Add a description for this task..."
+              />
 
               <Field.Error className="Error">
                 Description is optional but recommended for clarity.
@@ -174,18 +234,31 @@ const AddNewTask = ({ modal }: { modal: ModalState["data"] }) => {
                 onSelect={(value) => setStatus(value as ModalType)}
                 selected={status ?? "Select Status"}
               />
+              {/* Hidden input to capture status value in form data */}
+              <input type="hidden" name="status" value={status || ""} />
               <Field.Error>Status is required.</Field.Error>
             </Field.Root>
           </Fieldset.Root>
 
-          <Button
-            variant="primary"
-            props={{
-              type: "submit",
-            }}
-          >
-            + Add Task
-          </Button>
+          <div className="flex gap-2 justify-end">
+            <Button
+              variant="secondary"
+              props={{
+                type: "button",
+                onClick: handleCancel,
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              props={{
+                type: "submit",
+              }}
+            >
+              + Add Task
+            </Button>
+          </div>
         </Form>
       </div>
     </>
