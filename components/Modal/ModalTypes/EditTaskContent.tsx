@@ -1,9 +1,9 @@
 import { Column } from "@/kanban/lib/store/useColumnStore";
 import { ModalState } from "@/kanban/lib/store/useModalStore";
 import { useTasksStore } from "@/kanban/lib/store/useTasksStore";
-import { useState, useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import { useShallow } from "zustand/shallow";
-import Dropdown from "../../Board/components/Dropdown";
+import SelectDropdown from "../../Board/components/Dropdown";
 import Subtasks from "../../Board/components/Subtasks";
 import DottedMenu from "../../SVGIcons/DottedMenu";
 
@@ -14,7 +14,6 @@ const EditTaskContent = ({
   modal: ModalState["data"];
   columns: Column[];
 }) => {
-  const [selectedStatus, setSelectedStatus] = useState("TODO");
   const { updateTaskStatus } = useTasksStore(
     useShallow((state) => ({
       updateTaskStatus: state.updateTaskStatus,
@@ -42,8 +41,6 @@ const EditTaskContent = ({
 
   const handleSelectChange = useCallback(
     (value: string) => {
-      setSelectedStatus(value);
-
       // Update the task status when user selects a new option
       if (currentTaskId && task && value !== task.columnId) {
         const columnIndex = columns.findIndex(
@@ -59,14 +56,8 @@ const EditTaskContent = ({
     [currentTaskId, task, updateTaskStatus, columns]
   );
 
-  // Sync selectedStatus with the current task's columnId
-  useEffect(() => {
-    if (task && task.columnId) {
-      setSelectedStatus(
-        columns.find((col) => col.id === task.columnId)?.status || "TODO"
-      );
-    }
-  }, [task, columns]);
+  const selectedStatus = (columns: Column[]) =>
+    columns.find((col) => col.id === task?.columnId)?.status;
 
   // If task is not found, show loading state
   if (!task) {
@@ -92,11 +83,11 @@ const EditTaskContent = ({
           <h3 className="text-sm font-bold text-gray-400 dark:text-gray-500">
             Current Status
           </h3>
-          <Dropdown
+          <SelectDropdown
             options={columns
               .filter((col) => col.boardId === currentBoardId)
               .map((col) => col.status)}
-            selected={selectedStatus}
+            selected={selectedStatus(columns) || "TODO"}
             onSelect={handleSelectChange}
           />
         </div>
