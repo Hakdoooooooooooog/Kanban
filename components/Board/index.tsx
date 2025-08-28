@@ -6,7 +6,7 @@ import ModalRenderer from "../Modal/modal";
 import { useTasksStore } from "@/kanban/lib/store/useTasksStore";
 import { useShallow } from "zustand/shallow";
 import { useColumnStore } from "@/kanban/lib/store/useColumnStore";
-import { generateUUID, replaceSpacesWithDashes } from "@/kanban/lib/utils";
+import { replaceSpacesWithDashes } from "@/kanban/lib/utils";
 import BoardSkeleton from "./components/Skeleton";
 import BoardColumn, { AddColumn } from "./components/board-column";
 import { defaultColumns, sampleTasks } from "@/kanban/lib/const/board";

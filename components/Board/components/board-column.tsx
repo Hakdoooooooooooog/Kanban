@@ -1,8 +1,6 @@
-import { Column, useColumnStore } from "@/kanban/lib/store/useColumnStore";
+import { Column } from "@/kanban/lib/store/useColumnStore";
 import { Tasks } from "@/kanban/lib/store/useTasksStore";
 import BoardCard from "./board-card";
-import { generateUUID } from "@/kanban/lib/utils";
-import { useCallback } from "react";
 import { ModalType, useModalStore } from "@/kanban/lib/store/useModalStore";
 import { useShallow } from "zustand/shallow";
 

@@ -37,6 +37,19 @@ const AddNewTask = ({ modal }: { modal: ModalState["data"] }) => {
   const handleAddSubtask = () => {
     // Logic to add a subtask
     console.log("Add subtask clicked");
+
+    setSubtasks([...subtasks, { id: generateUUID(), taskId: "", title: "" }]);
+  };
+
+  const handleSubtaskChange = (index: number, title: string) => {
+    const updatedSubtasks = [...subtasks];
+    updatedSubtasks[index].title = title;
+    setSubtasks(updatedSubtasks);
+  };
+
+  const handleDeleteSubtask = (index: number) => {
+    const updatedSubtasks = subtasks.filter((_, i) => i !== index);
+    setSubtasks(updatedSubtasks);
   };
 
   const handleAddTask = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -89,13 +102,17 @@ const AddNewTask = ({ modal }: { modal: ModalState["data"] }) => {
             <Field.Root className="Field">
               <Field.Label className="Label">Subtasks</Field.Label>
               {subtasks.length > 0 ? (
-                <ul className="w-full flex flex-col gap-2">
+                <ul className="p-2 w-full flex flex-col gap-2 max-h-40 overflow-y-auto">
                   {subtasks.map((subtask, index) => (
-                    <li key={index}>
+                    <li key={index} className="flex items-center gap-2">
                       <Field.Control
                         required
                         placeholder="e.g. Create wireframes, Get feedback from team"
                         className="Input"
+                        value={subtask.title}
+                        onChange={(e) =>
+                          handleSubtaskChange(index, e.target.value)
+                        }
                       />
                       <svg
                         className="w-4 h-4 text-gray-400 cursor-pointer hover:text-red-500 transition-colors duration-200"
@@ -103,8 +120,7 @@ const AddNewTask = ({ modal }: { modal: ModalState["data"] }) => {
                         viewBox="0 0 20 20"
                         fill="none"
                         onClick={() => {
-                          // Logic to delete the subtask
-                          console.log("Delete subtask clicked");
+                          handleDeleteSubtask(index);
                         }}
                       >
                         <line
