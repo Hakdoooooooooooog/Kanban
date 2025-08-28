@@ -11,6 +11,7 @@ import BoardSkeleton from "./components/Skeleton";
 import BoardColumn, { AddColumn } from "./components/board-column";
 import { defaultColumns, sampleTasks } from "@/kanban/lib/const/board";
 import { useBoardStore } from "@/kanban/lib/store/useBoardStore";
+import { ModalType, useModalStore } from "@/kanban/lib/store/useModalStore";
 
 const Board = ({ boardId }: { boardId: string }) => {
   const [isLoading, setIsLoading] = useState(true);
@@ -36,7 +37,6 @@ const Board = ({ boardId }: { boardId: string }) => {
   );
 
   const setTasks = useTasksStore(useShallow((state) => state.setTasks));
-
   const setColumns = useColumnStore(useShallow((state) => state.setColumns));
 
   // Loading state, can be replaced with actual loading logic when fetching data
@@ -116,32 +116,11 @@ const Board = ({ boardId }: { boardId: string }) => {
 };
 
 const EmptyBoard = ({ boardId }: { boardId: string }) => {
-  const { addNewColumn } = useColumnStore(
+  const { openModal } = useModalStore(
     useShallow((state) => ({
-      addNewColumn: state.addColumn,
+      openModal: state.openModal,
     }))
   );
-
-  const handleAddColumn = () => {
-    const columnName = prompt("Enter column name:") || "New Column";
-    const colors = [
-      "#49C4E5",
-      "#635fc7",
-      "#67E2AE",
-      "#F39C12",
-      "#E74C3C",
-      "#9B59B6",
-      "#1ABC9C",
-    ];
-
-    const randomColor = colors[Math.floor(Math.random() * colors.length)];
-    addNewColumn({
-      id: generateUUID(),
-      boardId: boardId,
-      status: columnName.toUpperCase().replace(/\s+/g, "_"),
-      color: randomColor,
-    });
-  };
 
   return (
     <div className="min-h-[90%] flex items-center justify-center">
@@ -150,11 +129,13 @@ const EmptyBoard = ({ boardId }: { boardId: string }) => {
       </h2>
       <Button
         props={{
-          onClick: handleAddColumn,
+          onClick: () => openModal(ModalType.ADD_COLUMN, { boardId }),
         }}
       >
         + Add New Column
       </Button>
+
+      <ModalRenderer />
     </div>
   );
 };

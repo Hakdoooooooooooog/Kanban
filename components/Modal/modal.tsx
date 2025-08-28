@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useMemo, memo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useModalStore, ModalType } from "@/kanban/lib/store/useModalStore";
 import { useColumnStore } from "@/kanban/lib/store/useColumnStore";
 import { useShallow } from "zustand/shallow";
@@ -10,7 +10,7 @@ import "./modal.css";
 import AddNewTask from "./ModalTypes/AddNewTask";
 
 // Main Modal Renderer - handles backdrop, ESC key, and renders modal content
-const ModalRenderer = memo(() => {
+const ModalRenderer = () => {
   const { modal, closeModal } = useModalStore(
     useShallow((state) => ({
       modal: state.modal,
@@ -74,7 +74,7 @@ const ModalRenderer = memo(() => {
       </div>
     </div>
   );
-});
+};
 
 // Modal Skeleton Component
 
@@ -89,7 +89,5 @@ const PlaceholderContent = ({ modalType }: { modalType: string | null }) => (
     </p>
   </div>
 );
-
-ModalRenderer.displayName = "ModalRenderer";
 
 export default ModalRenderer;

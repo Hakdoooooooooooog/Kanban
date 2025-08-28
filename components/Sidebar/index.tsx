@@ -76,6 +76,7 @@ const Sidebar = () => {
     }
   }, []);
 
+  // This will be replaced by fetching boards from an API
   useEffect(() => {
     // Initialize boards if not already set
     if (!boards || boards.length === 0) {
