@@ -146,7 +146,7 @@ const AddNewTask = ({ modal }: { modal: ModalState["data"] }) => {
               <input
                 {...register("title", { required: "Task title is required" })}
                 placeholder="e.g. Design a new logo"
-                className="Input w-full p-2 border rounded-md"
+                className={`Input ${errors.title ? "border-red-500" : ""}`}
                 type="text"
               />
               {errors.title && (
@@ -192,11 +192,19 @@ const AddNewTask = ({ modal }: { modal: ModalState["data"] }) => {
                             },
                           })}
                           placeholder="e.g. Create wireframes, Get feedback from team"
-                          className="Input flex-1 p-2 border rounded-md"
+                          className={`Input ${
+                            errors.subtasks?.[index]?.title
+                              ? "border-red-500"
+                              : ""
+                          }`}
                           type="text"
                         />
                         <svg
-                          className="w-4 h-4 text-gray-400 cursor-pointer hover:text-red-500 transition-colors duration-200"
+                          className={`w-4 h-4 text-gray-400 cursor-pointer hover:text-red-500 transition-colors duration-200 ${
+                            errors.subtasks?.[index]?.title
+                              ? "text-red-500"
+                              : ""
+                          }`}
                           xmlns="http://www.w3.org/2000/svg"
                           viewBox="0 0 20 20"
                           fill="none"
@@ -262,6 +270,7 @@ const AddNewTask = ({ modal }: { modal: ModalState["data"] }) => {
                     options={statusOptions}
                     onSelect={(value) => field.onChange(value)}
                     selected={field.value || "Select Status"}
+                    error={!!errors.status}
                   />
                 )}
               />

@@ -68,7 +68,6 @@ const BoardsList = ({ boards }: Pick<BoardStore, "boards">) => {
                 <li
                   key={board.id}
                   onClick={() => {
-                    // Prevent navigation if board is currently loading or if this board is already active
                     if (
                       isBoardLoading ||
                       board.isActive ||

@@ -5,10 +5,12 @@ const SelectDropdown = ({
   options,
   onSelect,
   selected,
+  error,
 }: {
   options: string[];
   onSelect: (value: string) => void;
   selected: string;
+  error?: boolean;
 }) => {
   const selectItems = useMemo(() => {
     return options.map((option) => ({
@@ -19,7 +21,7 @@ const SelectDropdown = ({
 
   return (
     <Select.Root items={selectItems}>
-      <Select.Trigger className="Select">
+      <Select.Trigger className={`Select ${error ? "border-red-500" : ""}`}>
         <Select.Value render={<span>{selected}</span>} />
         <Select.Icon className="SelectIcon">
           <ChevronDownIcon />
