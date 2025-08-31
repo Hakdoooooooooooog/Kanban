@@ -2,7 +2,7 @@ import ModalRenderer from "@/kanban/components/Modal/modal";
 
 export default function Dashboard() {
   return (
-    <div className="min-h-[calc(100vh-73px)] flex items-center justify-center flex-col gap-4 bg-gray-100 dark:bg-gray-800">
+    <div className="min-h-[calc(100dvh-73px)] flex items-center justify-center flex-col gap-4 bg-gray-100 dark:bg-gray-800">
       <h2 className="text-lg font-bold p-4 text-black dark:text-white">
         Welcome to the Kanban Dashboard! Create your first board to get started.
       </h2>

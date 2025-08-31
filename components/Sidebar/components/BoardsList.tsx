@@ -49,7 +49,7 @@ const BoardsList = ({ boards }: Pick<BoardStore, "boards">) => {
   const showSkeleton = isLoading || !boards || boards.length === 0;
 
   return (
-    <div className="w-[95%] h-full flex flex-col gap-2 my-auto">
+    <div className="min-h-[calc(100dvh-250px)] flex flex-col gap-2">
       <p className="text-sm text-gray-500 p-2 pl-10 dark:text-gray-400">
         ALL BOARDS
         <span className="ml-2">({showSkeleton ? "..." : boards.length})</span>

@@ -66,7 +66,7 @@ export default function RootLayout({
         />
       </head>
       <body className={`${plusJakartaSans.variable} font-Jakarta antialiased`}>
-        <div className="flex w-full min-h-screen relative overflow-hidden custom-scrollbar">
+        <div className="flex w-full min-h-dvh relative overflow-hidden custom-scrollbar">
           <Sidebar />
           <MainContent>
             <Header />
