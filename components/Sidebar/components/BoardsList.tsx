@@ -22,9 +22,11 @@ const BoardsList = ({ boards }: Pick<BoardStore, "boards">) => {
   const path = usePathname();
   const [isLoading, setIsLoading] = useState(true);
 
-  const { openModal } = useModalStore(
+  const { modal, openModal, closeModal } = useModalStore(
     useShallow((state) => ({
+      modal: state.modal,
       openModal: state.openModal,
+      closeModal: state.closeModal,
     }))
   );
 
@@ -75,6 +77,10 @@ const BoardsList = ({ boards }: Pick<BoardStore, "boards">) => {
                       return;
                     }
                     router.push(`/Dashboard/${board.id}`);
+
+                    if (modal.isModalOpen) {
+                      closeModal();
+                    }
                   }}
                   className={`item ${
                     board.isActive || path === `/Dashboard/${board.id}`
