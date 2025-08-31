@@ -1,5 +1,6 @@
 import { useModalStore, ModalType } from "@/kanban/lib/store/useModalStore";
 import { Tasks } from "@/kanban/lib/store/useTasksStore";
+import { useCallback } from "react";
 import { useShallow } from "zustand/shallow";
 
 const BoardCard = ({
@@ -15,14 +16,7 @@ const BoardCard = ({
     }))
   );
 
-  const onOpenModal = () => {
-    openModal(ModalType.EDIT_TASK, {
-      taskId,
-      boardId,
-    });
-  };
-
-  const handleSubtaskCompletion = () => {
+  const handleSubtaskCompletion = useCallback(() => {
     const totalCompletedSubtasks = subtasks?.reduce(
       (acc, subtask) => acc + (subtask.isCompleted ? 1 : 0),
       0
@@ -33,12 +27,12 @@ const BoardCard = ({
     }
 
     return totalCompletedSubtasks;
-  };
+  }, [subtasks]);
 
   return (
     <>
       <div
-        onClick={onOpenModal}
+        onClick={() => openModal(ModalType.EDIT_TASK, { taskId, boardId })}
         className="w-full p-4 bg-gray-200 dark:bg-gray-800 hover:bg-gray-300 dark:hover:bg-gray-700 rounded-lg shadow-sm cursor-pointer"
       >
         <h4 className="text-md text-black dark:text-white font-semibold">
