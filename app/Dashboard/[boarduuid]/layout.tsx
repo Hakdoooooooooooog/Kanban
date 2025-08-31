@@ -4,7 +4,7 @@ export default function BoardMainLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="min-h-[90%] flex items-center justify-center flex-col gap-4">
+    <div className="h-[calc(100dvh-73px)] flex items-center justify-center flex-col gap-4">
       {children}
     </div>
   );

@@ -10,10 +10,9 @@ import "./modal.css";
 import AddNewTask from "./ModalTypes/AddNewTask";
 import useSidebarStore from "@/kanban/lib/store/useSidebarStore";
 
-// Main Modal Renderer - handles backdrop, ESC key, route navigation, and renders modal content
+// Main Modal Renderer - handles backdrop, ESC key, and renders modal content
 const ModalRenderer = () => {
   const { isSidebarHidden } = useSidebarStore();
-  const modalRef = React.useRef<HTMLDivElement | null>(null);
 
   const { modal, closeModal } = useModalStore(
     useShallow((state) => ({
@@ -43,16 +42,6 @@ const ModalRenderer = () => {
     return () => document.removeEventListener("keydown", handleEscKey);
   }, [modal.isModalOpen, closeModal]);
 
-  useEffect(() => {
-    if (!modalRef.current) return;
-
-    gsap.to(modalRef.current, {
-      opacity: 0,
-      duration: 0.2,
-      onComplete: closeModal,
-    });
-  }, [closeModal]);
-
   // Render modal content based on type
   const renderModalContent = useMemo(() => {
     switch (modal.modalType) {
@@ -80,7 +69,6 @@ const ModalRenderer = () => {
 
   return (
     <div
-      ref={modalRef}
       className={`fixed inset-0 flex items-center justify-center bg-black/50 pointer-events-auto ${
         isSidebarHidden ? "ml-0 w-full" : "ml-[300px] w-[calc(100%-300px)]"
       }`}

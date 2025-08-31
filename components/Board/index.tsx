@@ -47,12 +47,12 @@ const Board = ({ boardId }: { boardId: string }) => {
     const timer = setTimeout(() => {
       setIsLoading(false);
       setActiveBoard(boardId);
-      setLoading(false); // Set loading to false when board is ready
-    }, 500); // Adjust delay as needed
+      setLoading(false);
+    }, 500);
 
     return () => {
       clearTimeout(timer);
-      setLoading(false); // Cleanup: ensure loading is false if component unmounts
+      setLoading(false);
     };
   }, [boardId, setActiveBoard, setLoading]);
 
@@ -73,7 +73,7 @@ const Board = ({ boardId }: { boardId: string }) => {
 
   if (!boards.some((board) => board.id === boardId)) {
     return (
-      <section className="w-full h-[calc(100dvh-73px)] flex flex-col items-center justify-center bg-gray-200 dark:bg-gray-900">
+      <section className="w-full min-h-full flex flex-col items-center justify-center bg-gray-200 dark:bg-gray-900">
         <h2 className="text-lg font-bold p-4 text-black dark:text-white">
           Board not found. Please check the board ID.
         </h2>
@@ -93,7 +93,7 @@ const Board = ({ boardId }: { boardId: string }) => {
   }
 
   return (
-    <section className="w-full h-[calc(100dvh-73px)] relative overflow-x-auto overflow-y-hidden bg-gray-200 dark:bg-gray-900 p-4">
+    <section className="w-full min-h-full relative overflow-x-auto overflow-y-hidden bg-gray-200 dark:bg-gray-900 p-4">
       <div className="h-full flex gap-4 transition-all duration-400 ease-in-out min-w-max">
         {columns.map((column) => {
           const columnTasks = tasks.filter(
@@ -123,7 +123,7 @@ const EmptyBoard = ({ boardId }: { boardId: string }) => {
   );
 
   return (
-    <div className="min-h-[90%] flex items-center justify-center">
+    <div className="w-full min-h-full flex items-center justify-center">
       <h2 className="text-lg font-bold p-4">
         This board is empty. Create a new column to get started.
       </h2>
