@@ -4,12 +4,12 @@ import { useMemo } from "react";
 const SelectDropdown = ({
   options,
   onSelect,
-  selected,
+  selected = "Select Status",
   error,
 }: {
   options: string[];
   onSelect: (value: string) => void;
-  selected: string;
+  selected?: string;
   error?: boolean;
 }) => {
   const selectItems = useMemo(() => {

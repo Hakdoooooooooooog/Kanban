@@ -18,16 +18,28 @@ import {
   useFieldArray,
   Controller,
 } from "react-hook-form";
+import CloseIcon from "../../SVGIcons/CloseIcon";
 
 // Define the form data type
 type FormData = {
   title: string;
   description: string;
-  subtasks: { title: string }[];
+  subtasks: { title: string; isCompleted: boolean }[];
   status: string;
 };
 
 const AddNewTask = ({ modal }: { modal: ModalState["data"] }) => {
+  const boardId =
+    (modal as { data?: { boardId?: string } })?.data?.boardId || "";
+
+  const { getColumnById } = useColumnStore(
+    useShallow((state) => ({
+      getColumnById: state.getColumnById,
+    }))
+  );
+
+  const columns = getColumnById(boardId) || [];
+
   const {
     register,
     handleSubmit,
@@ -35,12 +47,9 @@ const AddNewTask = ({ modal }: { modal: ModalState["data"] }) => {
     reset,
     formState: { errors },
   } = useForm<FormData>({
-    mode: "onSubmit", // This ensures validation happens on submit
+    mode: "onChange",
     defaultValues: {
-      title: "",
-      description: "",
-      subtasks: [],
-      status: "",
+      status: columns[0]?.status,
     },
   });
 
@@ -61,26 +70,13 @@ const AddNewTask = ({ modal }: { modal: ModalState["data"] }) => {
     }))
   );
 
-  const boardId =
-    (modal as { data?: { boardId?: string } })?.data?.boardId || "";
-
-  const { getAllColumnStatusByBoardId, getColumnById } = useColumnStore(
-    useShallow((state) => ({
-      getAllColumnStatusByBoardId: state.getAllColumnStatusByBoardId,
-      getColumnById: state.getColumnById,
-    }))
-  );
-
-  const statusOptions = getAllColumnStatusByBoardId(boardId);
-  const columns = getColumnById(boardId) || [];
-
   const handleCancel = () => {
     reset();
     closeModal();
   };
 
   const handleAddSubtask = () => {
-    append({ title: "" });
+    append({ title: "", isCompleted: false });
   };
 
   const handleDeleteSubtask = (index: number) => {
@@ -99,13 +95,13 @@ const AddNewTask = ({ modal }: { modal: ModalState["data"] }) => {
 
     // Convert form subtasks to proper Subtask format
     const formattedSubtasks: Subtask[] = data.subtasks
-      .filter((subtask) => subtask.title.trim() !== "")
-      .map((subtask) => ({
-        id: generateUUID(),
-        taskId: taskId,
-        title: subtask.title,
-        isCompleted: false,
-      }));
+      ? data.subtasks.map((subtask) => ({
+          id: generateUUID(),
+          taskId: taskId,
+          title: subtask.title,
+          isCompleted: subtask.isCompleted,
+        }))
+      : [];
 
     const newTask: Tasks = {
       id: taskId,
@@ -199,36 +195,12 @@ const AddNewTask = ({ modal }: { modal: ModalState["data"] }) => {
                           }`}
                           type="text"
                         />
-                        <svg
-                          className={`w-4 h-4 text-gray-400 cursor-pointer hover:text-red-500 transition-colors duration-200 ${
-                            errors.subtasks?.[index]?.title
-                              ? "text-red-500"
-                              : ""
-                          }`}
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 20 20"
-                          fill="none"
-                          onClick={() => handleDeleteSubtask(index)}
-                        >
-                          <line
-                            x1="4"
-                            y1="4"
-                            x2="16"
-                            y2="16"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                          />
-                          <line
-                            x1="16"
-                            y1="4"
-                            x2="4"
-                            y2="16"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                          />
-                        </svg>
+                        <CloseIcon
+                          isError={!!errors.subtasks?.[index]?.title}
+                          props={{
+                            onClick: () => handleDeleteSubtask(index),
+                          }}
+                        />
                       </div>
                       {/* Display individual subtask errors */}
                       {errors.subtasks?.[index]?.title && (
@@ -267,9 +239,9 @@ const AddNewTask = ({ modal }: { modal: ModalState["data"] }) => {
                 rules={{ required: "Status is required" }}
                 render={({ field }) => (
                   <SelectDropdown
-                    options={statusOptions}
+                    options={columns.map((col) => col.status)}
                     onSelect={(value) => field.onChange(value)}
-                    selected={field.value || "Select Status"}
+                    selected={field.value}
                     error={!!errors.status}
                   />
                 )}
