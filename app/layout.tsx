@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "../components/Header";
 import MainContent from "../components/MainContent";
 import Sidebar from "../components/Sidebar";
+import ToastContainer from "../components/Toast";
 
 const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -73,6 +74,7 @@ export default function RootLayout({
             {children}
           </MainContent>
         </div>
+        <ToastContainer />
       </body>
     </html>
   );
