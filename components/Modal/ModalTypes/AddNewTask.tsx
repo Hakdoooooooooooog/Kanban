@@ -5,7 +5,7 @@ import {
   Tasks,
   useTasksStore,
 } from "@/kanban/lib/store/useTasksStore";
-import { generateUUID, toast } from "@/kanban/lib/utils";
+import { generateUUID } from "@/kanban/lib/utils";
 import { useShallow } from "zustand/shallow";
 import { Field, Fieldset, Form } from "@base-ui-components/react";
 import Button from "../../button";
@@ -19,6 +19,7 @@ import {
   Controller,
 } from "react-hook-form";
 import CloseIcon from "../../SVGIcons/CloseIcon";
+import { toast } from "../../Toast/toast";
 
 // Define the form data type
 type FormData = {

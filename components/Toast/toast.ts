@@ -1,4 +1,4 @@
-import useToastStore from "../store/useToastStore";
+import useToastStore from "../../lib/store/useToastStore";
 
 /**
  * Toast utility functions for easy access throughout the application

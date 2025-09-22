@@ -11,5 +11,3 @@ export const generateUUID = () => {
 export const mergeClassnames = (...classes: (string | undefined)[]) => {
   return classes.filter(Boolean).join(" ");
 };
-
-export { toast, useToast, errorToasts } from "./toast";
