@@ -60,6 +60,22 @@ export const toast = {
   remove: (id: string) => {
     useToastStore.getState().removeToast(id);
   },
+
+  /**
+   * Set the maximum number of toasts that can be displayed simultaneously
+   * @param limit - Maximum number of toasts (minimum 1)
+   */
+  setLimit: (limit: number) => {
+    useToastStore.getState().setMaxToasts(limit);
+  },
+
+  /**
+   * Get the current maximum toast limit
+   * @returns The current maximum number of toasts
+   */
+  getLimit: () => {
+    return useToastStore.getState().maxToasts;
+  },
 };
 
 /**
@@ -74,6 +90,8 @@ export const useToast = () => {
     showInfo,
     clearAllToasts,
     removeToast,
+    setMaxToasts,
+    maxToasts,
   } = useToastStore();
 
   return {
@@ -83,6 +101,8 @@ export const useToast = () => {
     info: showInfo,
     clearAll: clearAllToasts,
     remove: removeToast,
+    setLimit: setMaxToasts,
+    getLimit: () => maxToasts,
   };
 };
 

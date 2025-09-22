@@ -74,7 +74,7 @@ export default function RootLayout({
             {children}
           </MainContent>
         </div>
-        <ToastContainer />
+        <ToastContainer limit={3} />
       </body>
     </html>
   );

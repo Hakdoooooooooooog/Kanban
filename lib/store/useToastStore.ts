@@ -11,9 +11,11 @@ export interface Toast {
 
 interface ToastStore {
   toasts: Toast[];
+  maxToasts: number;
   addToast: (toast: Omit<Toast, "id" | "isVisible">) => void;
   removeToast: (id: string) => void;
   clearAllToasts: () => void;
+  setMaxToasts: (limit: number) => void;
   showError: (title: string, message?: string, duration?: number) => void;
   showSuccess: (title: string, message?: string, duration?: number) => void;
   showWarning: (title: string, message?: string, duration?: number) => void;
@@ -22,6 +24,7 @@ interface ToastStore {
 
 const useToastStore = create<ToastStore>((set, get) => ({
   toasts: [],
+  maxToasts: 5, // Default limit of 5 toasts
 
   addToast: (toast) => {
     const id = Math.random().toString(36).substr(2, 9);
@@ -32,9 +35,19 @@ const useToastStore = create<ToastStore>((set, get) => ({
       duration: toast.duration ?? 5000, // Default 5 seconds
     };
 
-    set((state) => ({
-      toasts: [...state.toasts, newToast],
-    }));
+    set((state) => {
+      const updatedToasts = [...state.toasts, newToast];
+
+      // Enforce the limit by removing oldest toasts if we exceed maxToasts
+      if (updatedToasts.length > state.maxToasts) {
+        // Remove the oldest toasts that exceed the limit
+        return {
+          toasts: updatedToasts.slice(updatedToasts.length - state.maxToasts),
+        };
+      }
+
+      return { toasts: updatedToasts };
+    });
 
     // Auto-remove toast after duration
     if (newToast.duration && newToast.duration > 0) {
@@ -42,6 +55,23 @@ const useToastStore = create<ToastStore>((set, get) => ({
         get().removeToast(id);
       }, newToast.duration);
     }
+  },
+
+  setMaxToasts: (limit) => {
+    set((state) => {
+      const newLimit = Math.max(1, limit); // Ensure at least 1 toast can be shown
+      let updatedToasts = state.toasts;
+
+      // If current toasts exceed new limit, remove oldest ones
+      if (updatedToasts.length > newLimit) {
+        updatedToasts = updatedToasts.slice(updatedToasts.length - newLimit);
+      }
+
+      return {
+        maxToasts: newLimit,
+        toasts: updatedToasts,
+      };
+    });
   },
 
   removeToast: (id) => {

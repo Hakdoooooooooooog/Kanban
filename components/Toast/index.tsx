@@ -1,42 +1,159 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
+import { gsap } from "gsap";
 import useToastStore, { Toast } from "../../lib/store/useToastStore";
 import { mergeClassnames } from "../../lib/utils";
 import XIcon from "../SVGIcons/XIcon";
 
 interface ToastItemProps {
   toast: Toast;
+  index: number;
+  totalToasts: number;
   onRemove: (id: string) => void;
 }
 
-const ToastItem = ({ toast, onRemove }: ToastItemProps) => {
+const ToastItem = ({ toast, index, totalToasts, onRemove }: ToastItemProps) => {
   const [isLeaving, setIsLeaving] = useState(false);
+  const [hasAnimatedIn, setHasAnimatedIn] = useState(false);
+  const toastRef = useRef<HTMLDivElement>(null);
 
-  const handleRemove = () => {
+  const handleRemove = useCallback(() => {
     setIsLeaving(true);
-    // Wait for animation to complete before removing
-    setTimeout(() => {
-      onRemove(toast.id);
-    }, 300);
-  };
 
-  // Auto-hide toast when leaving animation starts
+    // Enhanced GSAP exit animation with multiple effects
+    if (toastRef.current) {
+      // Create a timeline for coordinated animations
+      const tl = gsap.timeline({
+        onComplete: () => {
+          onRemove(toast.id);
+        },
+      });
+
+      // First phase: Shrink and fade slightly
+      tl.to(toastRef.current, {
+        scale: 0.95,
+        opacity: 0.8,
+        duration: 0.1,
+        ease: "power2.out",
+      })
+        // Second phase: Slide out with rotation and scale down
+        .to(
+          toastRef.current,
+          {
+            x: 450,
+            rotation: 8,
+            scale: 0.7,
+            opacity: 0,
+            duration: 0.4,
+            ease: "back.in(1.7)",
+          },
+          "-=0.05"
+        ); // Start slightly before first animation ends
+
+      // Add a subtle blur effect during exit
+      tl.to(
+        toastRef.current,
+        {
+          filter: "blur(2px)",
+          duration: 0.3,
+          ease: "power2.in",
+        },
+        "-=0.3"
+      );
+    } else {
+      // Fallback if ref is not available
+      setTimeout(() => {
+        onRemove(toast.id);
+      }, 500); // Increased to match new animation duration
+    }
+  }, [toast.id, onRemove]);
+
+  // Initial entry animation - only runs once
   useEffect(() => {
-    if (isLeaving) return;
+    if (toastRef.current && !hasAnimatedIn && !isLeaving) {
+      // Calculate initial stack position (reversed - new toasts at bottom/back)
+      const scale = 1 - (totalToasts - 1 - index) * 0.05; // Older toasts are larger
+      const yOffset = (totalToasts - 1 - index) * -8; // Older toasts are higher
+      const zIndex = index + 1; // Older toasts have higher z-index
 
-    // Start exit animation 300ms before actual removal
+      // Enhanced entry animation with multiple phases
+      const tl = gsap.timeline({
+        onComplete: () => {
+          setHasAnimatedIn(true);
+        },
+      });
+
+      // Set initial off-screen state with rotation
+      gsap.set(toastRef.current, {
+        x: 450,
+        opacity: 0,
+        scale: 0.6,
+        rotation: -5,
+        y: 20,
+        zIndex: zIndex,
+        filter: "blur(1px)",
+      });
+
+      // Phase 1: Slide in with rotation correction
+      tl.to(toastRef.current, {
+        x: 0,
+        rotation: 0,
+        scale: scale * 0.9, // Start slightly smaller
+        opacity: 0.7,
+        filter: "blur(0px)",
+        duration: 0.3,
+        ease: "power2.out",
+      })
+        // Phase 2: Bounce to final position with scale
+        .to(
+          toastRef.current,
+          {
+            scale: scale,
+            y: yOffset,
+            opacity: 1,
+            duration: 0.35,
+            ease: "back.out(1.4)",
+          },
+          "-=0.1"
+        ); // Overlap slightly for smoothness
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Intentionally empty - we only want this to run on mount
+
+  // Update stack position when other toasts are added/removed
+  useEffect(() => {
+    if (toastRef.current && hasAnimatedIn && !isLeaving) {
+      const scale = 1 - (totalToasts - 1 - index) * 0.05; // Older toasts are larger
+      const yOffset = (totalToasts - 1 - index) * -8; // Older toasts are higher
+      const zIndex = index + 1; // Older toasts have higher z-index
+
+      gsap.to(toastRef.current, {
+        scale: scale,
+        y: yOffset,
+        zIndex: zIndex,
+        duration: 0.3,
+        ease: "power2.out",
+      });
+    }
+  }, [index, totalToasts, hasAnimatedIn, isLeaving]);
+
+  // Auto-hide toast after duration
+  useEffect(() => {
+    if (isLeaving || !hasAnimatedIn) return;
+
+    // Start exit animation after duration
     const timer = setTimeout(() => {
       if (toast.duration && toast.duration > 0) {
-        setIsLeaving(true);
+        handleRemove();
       }
-    }, Math.max(0, (toast.duration || 5000) - 300));
+    }, toast.duration || 5000);
 
     return () => clearTimeout(timer);
-  }, [toast.duration, isLeaving]);
+  }, [toast.duration, isLeaving, hasAnimatedIn, handleRemove]);
 
   const getToastStyles = () => {
     const baseStyles =
-      "min-w-[300px] max-w-[500px] p-4 rounded-lg shadow-lg border transition-all duration-300 ease-in-out transform";
+      "min-w-[300px] max-w-[500px] p-4 rounded-lg shadow-lg border absolute transform-gpu pointer-events-auto";
 
     const typeStyles = {
       error:
@@ -48,11 +165,7 @@ const ToastItem = ({ toast, onRemove }: ToastItemProps) => {
       info: "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800 text-blue-800 dark:text-blue-200",
     };
 
-    const animationStyles = isLeaving
-      ? "translate-x-full opacity-0 scale-95"
-      : "translate-x-0 opacity-100 scale-100";
-
-    return mergeClassnames(baseStyles, typeStyles[toast.type], animationStyles);
+    return mergeClassnames(baseStyles, typeStyles[toast.type]);
   };
 
   const getIconColor = () => {
@@ -136,8 +249,37 @@ const ToastItem = ({ toast, onRemove }: ToastItemProps) => {
     }
   };
 
+  // Add hover effects for interactive preview
+  const handleMouseEnter = useCallback(() => {
+    if (toastRef.current && !isLeaving) {
+      gsap.to(toastRef.current, {
+        scale: (1 - (totalToasts - 1 - index) * 0.05) * 1.02, // Slightly larger
+        rotation: 1,
+        duration: 0.2,
+        ease: "power2.out",
+      });
+    }
+  }, [index, totalToasts, isLeaving]);
+
+  const handleMouseLeave = useCallback(() => {
+    if (toastRef.current && !isLeaving) {
+      const originalScale = 1 - (totalToasts - 1 - index) * 0.05;
+      gsap.to(toastRef.current, {
+        scale: originalScale,
+        rotation: 0,
+        duration: 0.2,
+        ease: "power2.out",
+      });
+    }
+  }, [index, totalToasts, isLeaving]);
+
   return (
-    <div className={getToastStyles()}>
+    <div
+      ref={toastRef}
+      className={getToastStyles()}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <div className="flex items-start gap-3">
         {getIcon()}
         <div className="flex-1 min-w-0">
@@ -158,20 +300,36 @@ const ToastItem = ({ toast, onRemove }: ToastItemProps) => {
   );
 };
 
-const ToastContainer = () => {
-  const { toasts, removeToast } = useToastStore();
+const ToastContainer = ({ limit }: { limit?: number } = {}) => {
+  const { toasts, removeToast, maxToasts, setMaxToasts } = useToastStore();
+
+  // Set the limit if provided as prop
+  useEffect(() => {
+    if (limit !== undefined && limit !== maxToasts) {
+      setMaxToasts(limit);
+    }
+  }, [limit, maxToasts, setMaxToasts]);
 
   if (toasts.length === 0) return null;
 
   return (
     <div
-      className="fixed bottom-4 right-4 z-50 flex flex-col gap-2"
+      className="fixed bottom-4 right-4 z-50 pointer-events-none"
+      style={{ width: "16vw", height: "8vh" }}
       role="region"
       aria-label="Notifications"
     >
-      {toasts.map((toast) => (
-        <ToastItem key={toast.id} toast={toast} onRemove={removeToast} />
-      ))}
+      <div className="relative">
+        {toasts.map((toast, index) => (
+          <ToastItem
+            key={toast.id}
+            toast={toast}
+            index={index}
+            totalToasts={toasts.length}
+            onRemove={removeToast}
+          />
+        ))}
+      </div>
     </div>
   );
 };
