@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import DottedMenu from "../SVGIcons/DottedMenu";
+import DropdownMenu, { DropdownOption } from "../dropdown-menu";
 import Button from "../button";
 import { ModalType, useModalStore } from "@/kanban/lib/store/useModalStore";
 import { useShallow } from "zustand/shallow";
@@ -37,6 +37,24 @@ const Header = () => {
     openModal(ModalType.ADD_TASK, data);
   };
 
+  const boardActionOptions: DropdownOption[] = [
+    {
+      id: "edit-board",
+      label: "Edit Board",
+      onClick: () => {
+        console.log("Edit Board clicked");
+      },
+    },
+    {
+      id: "delete-board",
+      label: "Delete Board",
+      onClick: () => {
+        console.log("Delete Board clicked");
+      },
+      variant: "danger",
+    },
+  ];
+
   return (
     <nav className="w-full min-h-[73px] flex items-center justify-between p-4 bg-gray-100 dark:bg-gray-800 border-b border-gray-200">
       <h2 className="text-lg font-semibold text-black dark:text-white">
@@ -56,7 +74,7 @@ const Header = () => {
           </Button>
         )}
 
-        <DottedMenu />
+        <DropdownMenu options={boardActionOptions} />
       </div>
     </nav>
   );

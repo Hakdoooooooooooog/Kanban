@@ -3,9 +3,9 @@ import { ModalState } from "@/kanban/lib/store/useModalStore";
 import { useTasksStore } from "@/kanban/lib/store/useTasksStore";
 import { useCallback } from "react";
 import { useShallow } from "zustand/shallow";
-import SelectDropdown from "../../Board/components/Dropdown";
+import SelectDropdown from "../../select-dropdown";
 import Subtasks from "../../Board/components/Subtasks";
-import DottedMenu from "../../SVGIcons/DottedMenu";
+import DropdownMenu, { DropdownOption } from "../../dropdown-menu";
 
 const EditTaskContent = ({
   modal,
@@ -59,6 +59,24 @@ const EditTaskContent = ({
   const selectedStatus = (columns: Column[]) =>
     columns.find((col) => col.id === task?.columnId)?.status;
 
+  const editTaskOptions: DropdownOption[] = [
+    {
+      id: "edit-task",
+      label: "Edit Task",
+      onClick: () => {
+        console.log("Edit Task clicked");
+      },
+    },
+    {
+      id: "delete-task",
+      label: "Delete Task",
+      onClick: () => {
+        console.log("Delete Task clicked");
+      },
+      variant: "danger",
+    },
+  ];
+
   // If task is not found, show loading state
   if (!task) {
     return <ModalSkeleton />;
@@ -70,7 +88,7 @@ const EditTaskContent = ({
         <h2 className="text-lg font-semibold text-black dark:text-white">
           {task.title || "Task Title"}
         </h2>
-        <DottedMenu />
+        <DropdownMenu options={editTaskOptions} />
       </div>
       <p className="text-sm text-gray-500 dark:text-gray-300">
         {task.description || "No description provided."}

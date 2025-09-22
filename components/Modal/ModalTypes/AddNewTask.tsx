@@ -11,7 +11,7 @@ import { Field, Fieldset, Form } from "@base-ui-components/react";
 import Button from "../../button";
 import { useColumnStore } from "@/kanban/lib/store/useColumnStore";
 import "./styles.css";
-import SelectDropdown from "../../Board/components/Dropdown";
+import SelectDropdown from "../../select-dropdown";
 import {
   SubmitHandler,
   useForm,
