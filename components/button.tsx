@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { mergeClassnames } from "../lib/utils";
 
 interface ButtonProps {
   size?: "sm" | "lg";
@@ -37,20 +38,19 @@ const Button = ({
       "bg-gray-200 dark:bg-gray-700 text-gray-400 dark:text-gray-500 cursor-not-allowed",
   };
 
-  // Extract className from props and remove it from the rest of props
   const { className: propsClassName, ...restProps } = props;
 
-  const mergedClassName = [
-    baseStyles,
-    sizeStyles[size],
-    disabled ? variantStyles.disabled : variantStyles[variant],
-    propsClassName,
-  ]
-    .filter(Boolean)
-    .join(" ");
-
   return (
-    <button className={mergedClassName} {...restProps} disabled={disabled}>
+    <button
+      className={mergeClassnames(
+        baseStyles,
+        sizeStyles[size],
+        variantStyles[variant],
+        propsClassName
+      )}
+      {...restProps}
+      disabled={disabled}
+    >
       {children}
     </button>
   );
