@@ -20,23 +20,21 @@ const ToastItem = ({ toast, index, totalToasts, onRemove }: ToastItemProps) => {
   const handleRemove = useCallback(() => {
     setIsLeaving(true);
 
-    // Enhanced GSAP exit animation with multiple effects
     if (toastRef.current) {
-      // Create a timeline for coordinated animations
       const tl = gsap.timeline({
         onComplete: () => {
           onRemove(toast.id);
         },
       });
 
-      // First phase: Shrink and fade slightly
+      // Shrink and fade slightly
       tl.to(toastRef.current, {
         scale: 0.95,
         opacity: 0.8,
         duration: 0.1,
         ease: "power2.out",
       })
-        // Second phase: Slide out with rotation and scale down
+        // Slide out with rotation and scale down
         .to(
           toastRef.current,
           {
@@ -61,22 +59,18 @@ const ToastItem = ({ toast, index, totalToasts, onRemove }: ToastItemProps) => {
         "-=0.3"
       );
     } else {
-      // Fallback if ref is not available
       setTimeout(() => {
         onRemove(toast.id);
-      }, 500); // Increased to match new animation duration
+      }, 500);
     }
   }, [toast.id, onRemove]);
 
-  // Initial entry animation - only runs once
   useEffect(() => {
     if (toastRef.current && !hasAnimatedIn && !isLeaving) {
-      // Calculate initial stack position (reversed - new toasts at bottom/back)
-      const scale = 1 - (totalToasts - 1 - index) * 0.05; // Older toasts are larger
-      const yOffset = (totalToasts - 1 - index) * -8; // Older toasts are higher
-      const zIndex = index + 1; // Older toasts have higher z-index
+      const scale = 1 - (totalToasts - 1 - index) * 0.05;
+      const yOffset = (totalToasts - 1 - index) * -8;
+      const zIndex = index + 1;
 
-      // Enhanced entry animation with multiple phases
       const tl = gsap.timeline({
         onComplete: () => {
           setHasAnimatedIn(true);
@@ -94,7 +88,7 @@ const ToastItem = ({ toast, index, totalToasts, onRemove }: ToastItemProps) => {
         filter: "blur(1px)",
       });
 
-      // Phase 1: Slide in with rotation correction
+      //  Slide in with rotation correction
       tl.to(toastRef.current, {
         x: 0,
         rotation: 0,
@@ -104,7 +98,7 @@ const ToastItem = ({ toast, index, totalToasts, onRemove }: ToastItemProps) => {
         duration: 0.3,
         ease: "power2.out",
       })
-        // Phase 2: Bounce to final position with scale
+        // Bounce to final position with scale
         .to(
           toastRef.current,
           {
@@ -118,14 +112,14 @@ const ToastItem = ({ toast, index, totalToasts, onRemove }: ToastItemProps) => {
         ); // Overlap slightly for smoothness
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Intentionally empty - we only want this to run on mount
+  }, []);
 
   // Update stack position when other toasts are added/removed
   useEffect(() => {
     if (toastRef.current && hasAnimatedIn && !isLeaving) {
-      const scale = 1 - (totalToasts - 1 - index) * 0.05; // Older toasts are larger
-      const yOffset = (totalToasts - 1 - index) * -8; // Older toasts are higher
-      const zIndex = index + 1; // Older toasts have higher z-index
+      const scale = 1 - (totalToasts - 1 - index) * 0.05;
+      const yOffset = (totalToasts - 1 - index) * -8;
+      const zIndex = index + 1;
 
       gsap.to(toastRef.current, {
         scale: scale,
@@ -249,7 +243,6 @@ const ToastItem = ({ toast, index, totalToasts, onRemove }: ToastItemProps) => {
     }
   };
 
-  // Add hover effects for interactive preview
   const handleMouseEnter = useCallback(() => {
     if (toastRef.current && !isLeaving) {
       gsap.to(toastRef.current, {
@@ -303,7 +296,6 @@ const ToastItem = ({ toast, index, totalToasts, onRemove }: ToastItemProps) => {
 const ToastContainer = ({ limit }: { limit?: number } = {}) => {
   const { toasts, removeToast, maxToasts, setMaxToasts } = useToastStore();
 
-  // Set the limit if provided as prop
   useEffect(() => {
     if (limit !== undefined && limit !== maxToasts) {
       setMaxToasts(limit);

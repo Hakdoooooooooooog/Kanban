@@ -38,9 +38,7 @@ const useToastStore = create<ToastStore>((set, get) => ({
     set((state) => {
       const updatedToasts = [...state.toasts, newToast];
 
-      // Enforce the limit by removing oldest toasts if we exceed maxToasts
       if (updatedToasts.length > state.maxToasts) {
-        // Remove the oldest toasts that exceed the limit
         return {
           toasts: updatedToasts.slice(updatedToasts.length - state.maxToasts),
         };
@@ -59,10 +57,9 @@ const useToastStore = create<ToastStore>((set, get) => ({
 
   setMaxToasts: (limit) => {
     set((state) => {
-      const newLimit = Math.max(1, limit); // Ensure at least 1 toast can be shown
+      const newLimit = Math.max(1, limit);
       let updatedToasts = state.toasts;
 
-      // If current toasts exceed new limit, remove oldest ones
       if (updatedToasts.length > newLimit) {
         updatedToasts = updatedToasts.slice(updatedToasts.length - newLimit);
       }
