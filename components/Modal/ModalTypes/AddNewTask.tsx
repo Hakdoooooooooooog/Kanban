@@ -5,7 +5,7 @@ import {
   Tasks,
   useTasksStore,
 } from "@/kanban/lib/store/useTasksStore";
-import { generateUUID } from "@/kanban/lib/utils";
+import { generateUUID, toast } from "@/kanban/lib/utils";
 import { useShallow } from "zustand/shallow";
 import { Field, Fieldset, Form } from "@base-ui-components/react";
 import Button from "../../button";
@@ -84,6 +84,17 @@ const AddNewTask = ({ modal }: { modal: ModalState["data"] }) => {
   };
 
   const onSubmitAddTask: SubmitHandler<FormData> = async (data) => {
+    // Validate required fields with toasts
+    if (!data.title.trim()) {
+      toast.error("Title required", "Please enter a task title");
+      return;
+    }
+
+    if (!data.status) {
+      toast.error("Status required", "Please select a status for the task");
+      return;
+    }
+
     const selectedColumn = columns.find((col) => col.status === data.status);
 
     if (!selectedColumn) {
@@ -115,12 +126,19 @@ const AddNewTask = ({ modal }: { modal: ModalState["data"] }) => {
     try {
       addTask(newTask);
 
-      // Reset form and close modal
+      // Show success toast
+      toast.success(
+        "Task created successfully!",
+        `"${data.title}" has been added to ${data.status}`
+      );
+
       reset();
       closeModal();
     } catch (error) {
-      console.error("Error adding task:", error);
-      // Don't close modal if there's an error
+      toast.error(
+        "Failed to add task. Please try again.",
+        error instanceof Error ? error.message : undefined
+      );
     }
   };
 

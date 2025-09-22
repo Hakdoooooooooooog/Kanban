@@ -12,5 +12,4 @@ export const mergeClassnames = (...classes: (string | undefined)[]) => {
   return classes.filter(Boolean).join(" ");
 };
 
-// Re-export toast utilities
 export { toast, useToast, errorToasts } from "./toast";
